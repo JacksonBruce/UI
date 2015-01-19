@@ -1,0 +1,19 @@
+﻿@model MvcApplication1.Models.LoginModel
+
+@{
+    ViewBag.Title = "您的帐户";
+}
+
+@section Header {
+    @Html.ActionLink("Back", "Index", "Home", null, new { data_icon = "arrow-l", data_rel = "back" })
+    <h1>@ViewBag.Title</h1>
+}
+
+<p>
+    以 <strong>@User.Identity.Name</strong> 身份登录。
+</p>
+
+<ul data-role="listview" data-inset="true">
+    <li>@Html.ActionLink("更改密码", "ChangePassword")</li>
+    <li>@Html.ActionLink("注销", "LogOff")</li>
+</ul>
