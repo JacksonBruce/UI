@@ -229,7 +229,7 @@
         }
 
     })();
-    ////获取model的扩展方法
+    ////获取modelState的扩展方法
     (function () {
         var getVal = function (e, pr) {
             var tag = e[0].tagName;
@@ -250,30 +250,29 @@
             else { v = e.text() }
             return v;
         }
-        $.prototype.model = function (a) {
+        $.prototype.modelState = function (a) {
             var s = this, fd = "data-field", fl = "data-fill", ne = "name", m = {}, errors = [];
             $.each(s.find("[" + fd + "],[" + fl + "],[" + ne + "]")
                 , function (i, e) {
-                    var v, fn, err = false, n = (e = $(e)).attr(fd) || e.attr(fl) || e.attr(ne)
+                    var v, fn, err = false,lbls, j = $(e), n = j.attr(fd) || j.attr(fl) || j.attr(ne)
                     if (n) {
-                        v = getVal(e);
+                        v = getVal(j);
+                        if (j.valid && e.form) { try { if (!j.valid()) { err = true; lbls = $(e.form).validate().errorsFor(e) } } catch (x) { } }
                         fn = a ? a[n] : null;
                         if (typeof (fn) == "function") {
-                            var arg = { element: e, value: v };
-                            err = fn.call(s, v, arg);
+                            var arg = { element: j, errors: lbls,value:v };
+                            err = fn.call(s, v, arg) || err;
                             v = arg.value;
+                            if (arg.errors && !lbls)
+                            { lbls = arg.errors}
                         }
                         if (v !== null) {
                             var tmp = m[n];
-                            //m[n] = typeof (tmp) == "string" ? tmp + ($.trim(tmp) == "" ? "" : ",") + v : v;
-                           
                             if (tmp==null) { m[n] = v; }
                             else if (typeof (tmp) == "string"){ m[n] = [tmp, v] }
                             else {tmp.push(v)}
                         }
-                        if (err) {
-                            errors.push({ element: e, value: v, name: n });
-                        }
+                        if (err){errors.push({ element: j, value: v, name: n,labels:lbls })}
                     }
                 });
             return { errors: errors && errors.length ? errors : null, model: m };
@@ -282,26 +281,26 @@
             var s = this, fd = "data-field", fl = "data-fill", ne = "name";
             $.each(s.find("[" + fd + "],[" + fl + "],[" + ne + "]")
                 , function (i, e) {
-                    var v, fn, tag = e.tagName, n = (e = $(e)).attr(fd) || e.attr(fl) || e.attr(ne), pr = e.attr("data-property")
+                    var v, fn, tag = e.tagName,j=$(e),n = j.attr(fd) || j.attr(fl) || j.attr(ne), pr = j.attr("data-property")
                     if (n) {
                         fn = a ? a[n] : null;
                         if (typeof (fn) == "function") {
-                            var arg = { element: e, cancel: false };
-                            v = fn.call(s, getVal(e, pr), arg);
+                            var arg = { element: j, cancel: false };
+                            v = fn.call(s, getVal(j, pr), arg);
                             if (arg.cancel) return;
                         } else { v = fn || ""; }
                         if (pr) {
-                            if (pr == ":html") { e.html(v) }
-                            else if (pr == ":text") { e.text(v); }
-                            else { e.attr(pr, v); }
+                            if (pr == ":html") { j.html(v) }
+                            else if (pr == ":text") { j.text(v); }
+                            else { j.attr(pr, v); }
                         }
-                        else if (e.is(":checkbox,:radio")) {
-                            if (v === "") { v = getVal(e, pr) }
-                            e[0].checked = v && e.val() == v;
+                        else if (j.is(":checkbox,:radio")) {
+                            if (v === "") { v = getVal(j, pr) }
+                            j[0].checked = v && j.val() == v;
                         }
-                        else if (e.is("input,textarea,select")) { e.val(v) }
-                        else if (tag == "IMG") { e.attr("src", v) }
-                        else { e.text(v) }
+                        else if (j.is("input,textarea,select")) { j.val(v) }
+                        else if (tag == "IMG") { j.attr("src", v) }
+                        else { j.text(v) }
 
 
                     }
