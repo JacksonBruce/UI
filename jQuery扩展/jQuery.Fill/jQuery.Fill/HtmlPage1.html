@@ -11,10 +11,7 @@
 
     <title>jQuery fill方法测试 </title>
     <style>
-        .template {
-            display:none;
-        }
-
+    .template {display:none;}
     /*组合框的样式*/
     .combobox {position:relative;display:inline-block;}
     .combobox > ul.droplist {position:absolute;top:100%;left:0;right:0;z-index:9999999;min-height:100px;max-height:200px;overflow:auto;background-color:#fff;border:solid 1px #999;display:none; }
@@ -34,7 +31,7 @@
                 <label><input name="Gender" type="radio" value="false" />女 </label>
             </div>
             <div>
-                <label>name：</label><input name="name" required />
+                <label>name：</label><input name="name"/>
             </div>
             <div>
                 <label>title：</label><input name="title" />
@@ -120,18 +117,20 @@
     <div class="data3"></div>
     <h2>填充html字符串,或字段填充到的属性</h2>
     <div class="data4">
+       
         <div data-fill="content" data-property=":html"></div>
         <div data-fill="title" data-property="title">
             鼠标移在上面显示填充的数据
         </div>
+        <a href="javascript:" id="btn">代理事件</a>
     </div>
     <script src="Scripts/jquery-1.10.2.min.js"></script>
     <script src="Scripts/jquery.validate.js"></script>
-    <script src="Scripts/jquery.fill.1.0.js"></script>
+    <script src="Scripts/jquery.fill.1.0-min.js"></script>
     <script>
-        ///填充来自服务端的数据
+        ///填充来自服务端的数据*····
         $(".data0").fill("/home/getdata");
-
+        $(".data2 form").validate({ rules: { name: { minlength: 5, required: true } } });
 
         //填充来自数组模型
         var data=[{ "name": "kkkkkkkkk", "title": "hhhh", "date": "\/Date(1419466380000)\/", "books": [{ "name": "mvc 4.0 asdasd a", "author": "feng.wei.cai" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "bruce", "title": "hass", "date": "\/Date(1419552536000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "jack", "title": "tit", "date": "\/Date(1419466380000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "elon", "title": "boss", "date": "\/Date(1419466440000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }];
@@ -162,16 +161,14 @@
         //填充html字符串
         $(".data4").fill({ content: "<h4>这里是html内容</h4><p> 啊手动阀啊手动阀收到卡卡快乐圣诞快乐开始看了看的发生的第三方阿娇阿斯顿</p>",title:"提示嘻嘻嘻。。。。" })
 
-
+        //提交复杂的数据模型，转换成键值对，服务端可以直接使用mvc的默认模型绑定器
         $("#btnSubmit").click(function () {
-            $.ajax({
-                url: "/home/post", type: "POST", data: $.modelToNamesValues({
-                    ids: [1, 5, 8, 45]
-                    , create: new Date("2011/4/25"), children: [{ name: "hh", id: 54 }, { name: "ccc", id: 545 }, { name: "lll", id: 58,createdate:new Date("2015/1/29 15:25:59") }]
-                })
-            })
+            var model = {
+                ids: [1, 5, 8, 45]
+                    , create: new Date("2011/4/25"), children: [{ name: "hh", id: 54 }, { name: "ccc", id: 545 }, { name: "lll", id: 58, createdate: new Date("2015/1/29 15:25:59") }]
+            };
+            $.ajax({ url: "/home/post", type: "POST", data: $.toNameValues(model) })
         });
-
     </script>
 </body>
 
