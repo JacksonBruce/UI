@@ -72,19 +72,25 @@ namespace jQuery.Fill.Controllers
             });
         }
 
-        public ActionResult getdata()
+        public ActionResult getdata(int[] ids=null,int pageindex=0)
         {
 
-            return Json(from n in new string[] { "jackson;tit;2014-12-25", "bruce;hass;2014-12-25 23:55:56", "jack;tit;2014-12-25", "elon;boss;2014-12-25" }
-                        let arr = n.Split(';')
-                        select new
-                        {
-                            name = arr[0],
-                            title = arr[1],
-                            date = Convert.ToDateTime(arr[2]).AddMinutes(DateTime.Now.Millisecond)
-                            ,
-                            books = from b in new string[]{"mvc 4.0;feng","jQuery 10;Jonh"} let barr=b.Split(';') select  new { name = barr[0], author = barr[1] }
-                        });
+            return Json(new
+            {
+                data = from n in new string[] { "jackson;tit;2014-12-25", "bruce;hass;2014-12-25 23:55:56", "jack;tit;2014-12-25", "elon;boss;2014-12-25" }
+                       let arr = n.Split(';')
+                       select new
+                       {
+                           name = arr[0],
+                           title = arr[1],
+                           date = Convert.ToDateTime(arr[2]).AddMinutes(DateTime.Now.Millisecond)
+                           ,
+                           books = from b in new string[] { "mvc 4.0;feng", "jQuery 10;Jonh" } let barr = b.Split(';') select new { name = barr[0], author = barr[1] }
+                       }
+                       ,
+                pager = new { total = 33, index = pageindex, size = 10 }
+            });
+
 
 
         }

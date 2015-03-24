@@ -126,40 +126,43 @@
     </div>
     <script src="Scripts/jquery-1.10.2.min.js"></script>
     <script src="Scripts/jquery.validate.js"></script>
-    <script src="Scripts/jquery.fill.1.0-min.js"></script>
+    <!--<script src="Scripts/jquery.fill.1.0-min.js"></script>-->  
+      <script src="Scripts/jquery.fill.1.0.js"></script>
     <script>
-        ///填充来自服务端的数据*····
-        $(".data0").fill("/home/getdata");
+        //填充来自服务端的数据*····
+        $(".data0").fill("/home/getdata", {ids:[32,23]},true);
         $(".data2 form").validate({ rules: { name: { minlength: 5, required: true } } });
 
-        //填充来自数组模型
-        var data=[{ "name": "kkkkkkkkk", "title": "hhhh", "date": "\/Date(1419466380000)\/", "books": [{ "name": "mvc 4.0 asdasd a", "author": "feng.wei.cai" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "bruce", "title": "hass", "date": "\/Date(1419552536000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "jack", "title": "tit", "date": "\/Date(1419466380000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "elon", "title": "boss", "date": "\/Date(1419466440000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }];
-        $(".data1").fill(
-                data
-                ,
-                {
-                    ///是否追加到列表上，默认是false
-                    append: true
-                  ,
-                    ///自定义格式内容
-                    formater: function (v,arg) {
-                        if (arg.path == "date") {
-                            v ="中文日期格式（"+ v.getFullYear() + "年" + v.getMonth() + "月" + v.getDay() + "日）";
-                        }
-                        return v;
-                    }
-                    ,
-                    ///填充完毕后执行的方法
-                    complete: function () { alert("complete") }
-                })
-        ///填充表单来自服务端的数据
-        $(".data2").fill("/home/getform");
+        ////填充来自数组模型
+        //var data = { page: {total:223,size:12,index:2}, data: [{ "name": "kkkkkkkkk", "title": "hhhh", "date": "\/Date(1419466380000)\/", "books": [{ "name": "mvc 4.0 asdasd a", "author": "feng.wei.cai" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "bruce", "title": "hass", "date": "\/Date(1419552536000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "jack", "title": "tit", "date": "\/Date(1419466380000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "elon", "title": "boss", "date": "\/Date(1419466440000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }] };
+        //$(".data1").fill(
+        //        data
+        //        ,
+        //        {
+        //            pager:true,
+        //            ///是否追加到列表上，默认是false
+        //            append: true
+        //          ,
+        //            ///自定义格式内容
+        //            formater: function (v,arg) {
+        //                if (arg.path == "date") {
+        //                    v ="中文日期格式（"+ v.getFullYear() + "年" + v.getMonth() + "月" + v.getDay() + "日）";
+        //                }
+        //                return v;
+        //            }
+        //            ,
+        //            ///填充完毕后执行的方法
+        //            complete: function () { alert("complete") }
+        //        }
+        //        )
+        /////填充表单来自服务端的数据
+        //$(".data2").fill("/home/getform");
 
-        ///填充字符串
-        $(".data3").fill(null, "<p> 啊手动阀啊手动阀收到卡卡快乐圣诞快乐开始看了看的发生的第三方阿娇阿斯顿</p>");
+        /////填充字符串
+        //$(".data3").fill(null, "<p> 啊手动阀啊手动阀收到卡卡快乐圣诞快乐开始看了看的发生的第三方阿娇阿斯顿</p>");
 
-        //填充html字符串
-        $(".data4").fill({ content: "<h4>这里是html内容</h4><p> 啊手动阀啊手动阀收到卡卡快乐圣诞快乐开始看了看的发生的第三方阿娇阿斯顿</p>",title:"提示嘻嘻嘻。。。。" })
+        ////填充html字符串
+        //$(".data4").fill({ content: "<h4>这里是html内容</h4><p> 啊手动阀啊手动阀收到卡卡快乐圣诞快乐开始看了看的发生的第三方阿娇阿斯顿</p>",title:"提示嘻嘻嘻。。。。" })
 
         //提交复杂的数据模型，转换成键值对，服务端可以直接使用mvc的默认模型绑定器
         $("#btnSubmit").click(function () {

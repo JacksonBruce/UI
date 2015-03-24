@@ -8,15 +8,11 @@
     <meta name="format-detection" content="telephone=no">
 
     <title>自动加载数据 jQuery fill方法测试 </title>
-    <style>
-        .template {
-            display: none;
-        }
-    </style>
+    <style>.template{display:none;}</style>
 </head>
 <body>
     <div>
-        <h2>数据1</h2>
+        <!--<h2>数据1</h2>
         <ul class="data0" data-src="/home/getdata" data-delegate="load">
             <li class="template">
                 <label data-fill="name"></label>:<span data-fill="title"></span>
@@ -29,7 +25,7 @@
                     </div>
                 </div>
             </li>
-        </ul>
+        </ul>-->
         <h2>数据2</h2>
         <ul class="data1" data-delegate="{controls:'.btnGetData',type:'click',load:true}" data-src="/home/getdata">
             <li class="fill-item">
@@ -45,7 +41,7 @@
                         作者：<span data-fill="author">Jonh</span>
                     </div><div style="margin-bottom:1em;" class="template">
                         <label data-fill="name">bruce</label>
-                        作者：<span data-fill="author"></span>
+                        <!--作者：<span data-fill="author"></span>-->
                     </div>
                 </div>
             </li>
@@ -62,23 +58,14 @@
                 </div>
             </li>
         </ul>
-        <a href="javascript:" id="submit1" class="btnGetData" data-postparams="{id:22}" onclick="$(' <a href=\'javascript:\' class=\'btnGetData\'>dddd<'+'/a>').insertAfter(this)">submit1</a>
+        <a href="javascript:" id="submit1" class="btnGetData" data-postparams="{id:22}" onclick="$('<span>|</span><a href=\'javascript:\' class=\'btnGetData\'>dddd</a>').insertAfter(this)">submit1</a>
         <a href="javascript:" id="submit2" class="btnGetData" data-postparams="{id:23}" data-options="{append:true,complete:function(d){alert('追加的。。')}}">submit2</a>
     </div>
 
-    <h2>填充字符串</h2>
-    <div class="data3"></div>
-    <h2>填充html字符串,或字段填充到的属性</h2>
-    <div class="data4">
-
-        <div data-fill="content" data-property=":html"></div>
-        <div data-fill="title" data-property="title">
-            鼠标移在上面显示填充的数据
-        </div>
-    </div>
     <div id="info"></div>
     <script src="Scripts/jquery-1.10.2.min.js"></script>
     <script src="Scripts/jquery.validate.js"></script>
+    <!--<script src="Scripts/jquery.fill.1.0-min.js"></script>-->
     <script src="Scripts/jquery.fill.1.0.js"></script>
     
 </body>
