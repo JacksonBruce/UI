@@ -23,10 +23,12 @@ namespace jQuery.Fill.Controllers
 
 
 
+
     public class HomeController : Controller
     {
         public ActionResult Index()
         {
+
             return View();
         }
 
@@ -107,6 +109,22 @@ namespace jQuery.Fill.Controllers
             byte b = (byte)(a / 0x100);
 
             return Json(entity);
+        }
+
+        public ActionResult formPost(bool Gender, string name, string title, string date, int ID, Book book, int[] ListID,HttpPostedFileWrapper[] images)
+        {
+
+            return Json(new { err=true,message="err" });
+        }
+
+
+        public ActionResult File()
+        {
+
+
+
+            return Json(new { forms = Request.Form.Count, hasFile = Request.Files.Count > 0, Request.Files[0].FileName, Request.Files[0].ContentLength }, JsonRequestBehavior.AllowGet);
+        
         }
     }
 }

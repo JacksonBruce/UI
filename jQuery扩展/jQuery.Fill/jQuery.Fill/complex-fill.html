@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>复杂数据对象的填充</title>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <h1>复杂数据对象的填充</h1>
+        <p>
+            示例演示填充对象的对象，树形对象，树形列表等
+        </p>
+        <h2>
+            填充层级对象(对象中的对象)
+        </h2>
+        <div id="hierarchy">
+            <form>
+                <div class="form-group">
+                    <label>书名:</label>
+                    <input name="Name" type="text" class="form-control" />
+                </div>
+                <h4>作者</h4>
+                <div class="form-group">
+                    <label>First Name:</label>
+                    <input name="Author.FirstName" type="text" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>last Name:</label>
+                    <input name="Author.LastName" type="text" class="form-control" />
+                </div>
+
+
+            </form>
+        </div>
+        
+        <h2>填充树形对象</h2>
+        <div id="tree">
+            <ul>
+                <li>
+                    <h5 data-fill="Name"></h5>
+                    <ul data-fill="leaf">
+                        <li><h5 data-fill="Name"></h5>
+                            <ul data-fill="leaf">
+                                <li><h5 data-fill="Name"></h5>
+                                    <ul data-fill="leaf">
+                                        <li><h5 data-fill="Name"></h5></li>
+                                    </ul></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </li>
+            </ul>
+        </div>
+
+        <h2>填充树形列表</h2>
+        <ul id="treeList">
+            <li class="template">
+                <h5>
+                   <span data-fill="Name"></span>
+                </h5>
+            </li>
+        </ul>
+
+    </div>
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.fill.1.0.js"></script>
+    <script>
+        $("#hierarchy").fill({ Name: '深入理解Bootstrap', Author: { FirstName: '徐', LastName: '涛' } });
+        $('#tree').fill({ Name: 'root', leaf: { Name: 'leaf-1', leaf: { Name: 'leaf-2', leaf: { Name: 'leaf-3' } } } });
+
+        var json = [
+            {
+                Name: 'root-0',
+                children: [
+                    {
+                        Name: 'leaf-0-0',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                    ,
+                    {
+                        Name: 'leaf-0-1',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                ]
+            }
+            ,
+
+            {
+                Name: 'root-1',
+                children: [
+                    {
+                        Name: 'leaf-0-0',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                    ,
+                    {
+                        Name: 'leaf-0-1',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                ]
+            }
+            ,
+
+            {
+                Name: 'root-2',
+                children: [
+                    {
+                        Name: 'leaf-0-0',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                    ,
+                    {
+                        Name: 'leaf-0-1',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                ]
+            }
+            ,
+
+            {
+                Name: 'root-3',
+                children: [
+                    {
+                        Name: 'leaf-0-0',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                    ,
+                    {
+                        Name: 'leaf-0-1',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                ]
+            }
+
+        ];
+
+
+
+        $('#treeList').fill(json, { tree: true })
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>

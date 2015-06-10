@@ -3,29 +3,210 @@
 }
 
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <h1>jQuery.fill</h1>
+    <p class="lead">
+        jQuery.fill是一组填充数据的jQuery扩展方法，它试图将html、css与数据分离，减少大量的html拼接代码，提高web前端的工作效率，主要功能有：fill向匹配DOM对象填充来自服务器数据或者json对象；modelState将匹配的DOM对象反序列化为json对象，它可以和表单、jQuery.validtion协同工作，toNameValues是一个很有趣jQuery静态方法，它将复杂的js对象，数组等转换成一组键/值对提交给服务端，它和asp.net mvc的默认模型绑定器协同工作。
+ </p>
 </div>
 
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
+<h2>约定</h2>
+<p>
+    数据填充使用了属性约定和ID约定，分页、排序和模板使用了css类选择器约定
+</p>
+<h3>数据填充约定</h3>
+<p>
+    向一个jQuery对象填充数据时，查找带有data-fill | data-field | name属性的DOM对象并将json对象与之匹配的属性值向其填充，如果同时出现这个三个属性那么就按照前面的顺序进行优先填充，填充的默认规则由其标签类型决定，默认填充规则如下：<br />
+    1、input:checbox,input:radio （复选框和单选框） 如果元素的value是空的或者未设置value，那么值填充给value，如果value与填充的值相等，那么将checked属性设为true，否则false；<br/>
+    2、input,textarea,select 这种类型的元素直接将值填充给它的value属性；<br />
+    3、img 默认填充值给它的src属性；<br />
+    4、其他的标签默认填充text属性；<br />
+    5、text标签和data-replace属性，（text不是一个有效的html标签）当遇到text标签，或者标签包含有data-replace属性时，它将被填充的值替换掉；<br />
+    也可以通过data-property属性指定个填充属性来改变以上的默认规则，例如：&lt;a data-fill="url" data-property="href"&gt;点击这里&lt;/a&gt;； data-property属性的":text"和":html"有特殊的意义，:text表示填充文本内容也是大多数非表单标签（img除外）的默认填充规则，而:html则是用来指定填充元素的innerHTML属性，在填充富文本时很有用。
+    <br /><a href="/fill-convention.html">通过这个例子演示一下数据填充约定</a>
+</p>
+<h3>CSS类选择器约定</h3>
+<p>
+    当填充一个列表或者树形结构的数据时，需要在填充的容器中定义模板，用“template”CSS类选择器指定当前块是模板；<br />
+    列表的分页选择器约定：分页模板用：pager、第一页：first、最后页：last、下一页：next、上一页：prev、数字：number，其他信息遵循数据填充约定，分页按钮包含有data-page属性指定页面数；<br />
+    列表的排序需要指定一个表头，表头的默认类选择器是“thead”，可排序列由“sort”指定，包含“active”类选择器的表示当前排序列，默认是升序，“desc”类选择器指定降序，每个可排序列需要通过sortExpression（或者data-sortExpression）属性指定排序的字段，暂时不支持多字段排序规则。
+</p>
+<h3>触发器约定</h3>
+<p>
+    触发器是当用户触发click事件时才填充页面上的元素，或者提交表单，使用触发器减少大量重复的代码。<br />
+    data-toggle属性指定触发器的类型，是必须的，可选值有：fill | action | load,其实只有两种类型：填充和动作，load是填充的扩展形式，指定只在页面装载时自动填充元素，它必须和data-src属性一起使用，data-src指定数据来源的路径；<br />
+    data-target属性指定事件触发后填充的目标或者要提交的表单（非表单元素也可以）
+</p>
+<h3>方法</h3>
+<p>了解了前面的一些约定，再来看方法的使用和案例就容易理解多了</p>
+
+<h4>fill(url,params,options)方法</h4> 
+<div>
+    <p>描述：向jQuery对象填充来自服务端的数据，服务端必须返回json格式的数据。</p>
+    <h5>参数</h5>
+    <p>url: string 类型， 远程服务器的地址,将post请求这个地址获取数据</p>
+    <p>params: PlainObject 类型，post请求时提交的参数</p>
+    <p>options: PlainObject 类型，填充选项，下面将详细说明</p>
+
+    <h5>options（填充选项）</h5>
+    <ul>
+        <li>loading: string 类型 || jQuery 对象，表示在发送请求后等候响应的一个提示模板，默认值：".loading"。</li>
+        <li>
+            append: bool 类型，如果是填充列表是，指定是否追加填充，默认是false
+        </li>
+        <li>tree: bool 类型，指示填充的数据是否为树形数据，默认是false</li>
+        <li>children:string 类型，仅在填充树形数据时有效，指定子集的属性名称，默认是“children”</li>
+        <li>
+            <p>filling:  function(v,arg) 类型，在填充字段前触发的事件。</p>
+            <ol>
+                <li>this:根元素的jQuery对象</li>
+                <li>v: 填充的值。</li>
+                <li>
+                    arg: PlainObject 类型，事件传递的上下文参数。
+                    <ul>
+                        <li>cancel: bool 类型，默认值false，如果设为true，将取消底层的操作</li>
+                        <li>item: PlainObject 类型，取值的对象</li>
+                        <li>propertyName:string 类型，当前填充的字段名称</li>
+                        <li>path:string 类型，当前值的访问路径</li>
+                        <li>target:jQuery 对象，表示当前匹配的节点，如果为找到匹配的节点，那么可能为null或者是长度为零的jQuery对象</li>
+                        <li>sender:上下文对象</li>
+                    </ul>
+                </li>
+
+            </ol>
+        </li>
+        <li>
+            creatingNodes:function(arg) 类型，当创建树形的下一级节点时触发此事件，前提是tree选项设置为true
+            <ol>
+                <li>this:根元素的jQuery对象</li>
+                <li>
+                    arg: PlainObject 类型，事件传递的上下文参数。
+                    <ul>
+                        <li>cancel: bool 类型，默认值false，如果设为true，将取消底层的操作</li>
+                        <li>target: jQuery 对象，表示当前匹配的节点，如果为找到匹配的节点，那么可能为null或者是长度为零的jQuery对象</li>
+                        <li>item: PlainObject 类型，取值的对象</li>
+                        <li>children: Array 类型，子集的数据</li>
+                    </ul>
+                </li>
+            </ol>
+        </li>
+        <li>
+            creating:function(arg,e) 类型，绑定列表时，当创建行时触发的事件
+            <ol>
+                <li>this:jQuery 对象，表示当前匹配的节点，如果为找到匹配的节点，那么就是根节点</li>
+                <li>
+                    arg:  PlainObject 类型，事件传递的上下文参数。
+                    <ul>
+                        <li>cancel:  bool 类型，默认值false，如果设为true，将取消底层的操作</li>
+                        <li>item: 当前的行数据对象</li>
+                        <li>index: number 类型，当前行的索引</li>
+                    </ul>
+                </li>
+                <li>e: jQuery 对象，将要插入的节点，此节点根据模板克隆出来的，默认情况下插在模板的前面。</li>
+            </ol>
+        </li>
+        <li>
+            <p>complete: function(data) 类型 填充完成后触发的事件。</p>
+            <ol>
+                <li>this: jQuery对象</li>
+                <li>data: 已经填充的数据。</li>
+            </ol>
+        </li>
+
+        <li>
+            pager: PlainObject 类型，分页选项
+            <ol>
+                <li>prop: string 类型，获取返回数据分页信息的属性名称，如果为指定，那么自动识别,如：page、pager、paging、pagination。<br /> 例如： {page:{total:50,index:2,size:10},rows:[{name:'dd',id:1}]},那么将会自动获取page的值</li>
+                <li>rows: string 类型， 获取返回的数据行的属性名称，如果为指定，那么自动识别,如：data、rows、list、array、collection。<br />例如： {page:{total:50,index:2,size:10},rows:[{name:'dd',id:1}]},那么将会自动获取rows的值</li>
+                <li>buttons: number 类型，设置分页的数字按钮的数量，默认是10个数字按钮 </li>
+                <li>
+                    paging: function(arg) 类型，当点击分页按钮时触发此事件。
+                    <ul>
+                        <li>this:jQuery对象，被点击的按钮</li>
+                        <li>
+                            arg:PlainObject 类型，事件传递的上下文参数。
+                            <ul>
+                                <li>page: number 类型，将要转到页面索引。</li>
+                                <li>data: PlainObject 类型，上下文的提交参数</li>
+                                <li>option: PlainObject 类型，上下文的填充选项</li>
+                                <li>cancel: bool 类型，默认值false，如果设为true，将取消底层的操作</li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </li>
+                <li>
+                    offset: number 类型，页面索引的偏远数量，默认是0，有些时候页面的索引是从1开始，那么应该设置1，表示从1开始计算索引。
+                </li>
+                <li>selector: string 类型，表示分页模板的jQuery选择器，通过这个选择器查找分页模板,默认是".pagination" </li>
+                <li>
+                    active:string 类型，表示当前索引页的css类选择器，默认是"active"
+                </li>
+
+            </ol>
+            分页数据的其他约定：
+            <ul>
+                <li>总数量：用 total 或者 records 表示，不区分大小写。</li>
+                <li>页索引：用 index 或者 pageindex 表示，不区分大小写。</li>
+                <li>总页数：用 count 或者 pagecount 表示，不区分大小写。</li>
+                <li>单页总数：用 size 或者 pagesize 表示，不区分大小写。</li>
+            </ul>
+            例如：<br />
+            {page:{total:50,index:2,size:10,count:5},rows:[{name:'dd',id:1}....]}<br />
+            {page:{records:50,pageindex:2,pagesize:10,pagecount:5},rows:[{name:'dd',id:1}....]}<br />
+            {page:{total:50,pageindex:2,size:10,pagecount:5},rows:[{name:'dd',id:1}....]}<br />
+            以上都是符合约定的。
+        </li>
+        <li>
+            <p>sort: PlainObject 类型 || string 类型 || function(arg) 类型，排序选项。</p> 
+            <ol>
+                <li>name:string 类型，排序表达式提交的参数名称，默认是“sortExpression”。</li>
+                <li>thead: string 类型，排序表头的选择器，通过这个选择器查找排序表头的模板，默认值是“.thead”。</li>
+                <li>
+                    handler: function(arg) 类型， 当点击排序按钮时触发此事件。
+                    <ul>
+                        <li>this: jQuery 对象，表示触发排序事件的按钮。</li>
+                        <li>
+                            arg: PlainObject 类型，事件传递的上下文参数。
+                            <ul>
+                                <li>cancel: bool 类型，默认值false，如果设为true，将取消底层的操作。</li>
+                                <li>data: PlainObject 类型，上下文的提交参数。</li>
+                                <li>option: PlainObject 类型，上下文的填充选项。</li>
+                                <li>sortExpression: string 类型，排序表达式。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+            <p>sting 类型： 等同于 sort:{thead:'xxxx'}；</p> 
+            <p>function(arg) 类型：等同于 sort:{handler:function(arg){...}}；</p>
+
+        </li>
+    </ul>
+
+</div>
+<h4>fill(data,options)方法</h4>
+ <div>
+     <p>描述：向jQuery对象填充来指定的数据。</p>
+     <h5>参数</h5>
+     <p>data:PlainObject 类型|| number 类型 || bool 类型 || datetime 类型 || array 类型，将要填充的数据。</p>
+     <p>options: PlainObject 类型，填充选项，详细说明同上</p>
+ </div> 
+<h4>fill(url,allowPaging,complete)方法</h4>
+<div>
+    <h5>参数</h5>
+    <p>url: string 类型， 远程服务器的地址,将post请求这个地址获取数据</p>
+    <p>allowPaging: bool 类型，是否允许分页</p>
+    <p>complete: function(data) 类型 填充完成后触发的事件。</p>
+    <p>注：等同于fill(url,null,{complete:complete,pager:allowPaging})</p>
+</div>
+<h4>fill(url,params,filling,complete)方法</h4>
+<div>
+    <h5>参数</h5>
+    <p>url: string 类型， 远程服务器的地址,将post请求这个地址获取数据</p>
+    <p>params: PlainObject 类型，post请求时提交的参数</p>
+    <p>filling: function(v,arg) 类型，在填充字段前触发的事件</p>
+    <p>complete: function(data) 类型 填充完成后触发的事件。</p>
+    <p>注：等同于fill(url,params,{complete:complete,filling:filling})</p>
+</div>
 </div>

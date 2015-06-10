@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+</head>
+<body>
+    <div>
+        <form action="/home/formPost">
+            <h2>填充表单</h2>
+            <div class="data2">
+
+                <div>
+                    <label><input name="Gender" type="radio" value="true" />男 </label>
+                    <label><input name="Gender" type="radio" value="false" />女 </label>
+                </div>
+                <div>
+                    <label>name：</label><input name="name" required minlength="5" />
+                </div>
+                <div>
+                    <label>title：</label><input name="title" />
+                </div>
+                <div>
+                    <label>date：</label><input name="date" />
+                </div>
+                <h3>书籍</h3>
+                <div data-fill="book">
+                    <div>
+                        <label>name：</label><input name="book.name" />
+                    </div>
+                    <div>
+                        <label>author：</label><input name="book.author" />
+                    </div>
+                    <input name="book.ID" type="hidden" value="52" />
+                </div>
+                <div>
+                    <label>image：</label>
+                    <input type="file" name="images" multiple accept="" />
+                </div>
+                <div>
+
+                    <label><input name="ListID" type="checkbox" value="85" />85 </label>
+                    <label><input name="ListID" type="checkbox" value="2" />2 </label>
+                    <label><input name="ListID" type="checkbox" value="98" />98 </label>
+                    <label><input name="ListID" type="checkbox" value="75" />75 </label>
+                    <label><input name="ListID" type="checkbox" value="158" />158 </label>
+                    <label><input name="ListID" type="checkbox" value="78" />78 </label>
+                </div>
+                <input name="ID" type="hidden" value="25" />
+                <progress id="progress" style="width:200px;" value="0" max="1"></progress>
+                <div>
+                    <a href="javascript:" id="submit" data-toggle="action" data-target="form">submit</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.validate.js"></script>
+    <!--<script src="Scripts/jquery.fill.1.0-min.js"></script>-->
+    <script src="Scripts/jquery.fill.1.0.js" async></script>
+    
+</body>
+</html>
