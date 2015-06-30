@@ -29,12 +29,15 @@ namespace jQuery.Fill.Controllers
         public ActionResult Index()
         {
 
+
+
+
             return View();
         }
 
-        public ActionResult About()
+        public ActionResult Demo()
         {
-            ViewBag.Message = "Your application description page.";
+           
 
             return View();
         }
@@ -118,12 +121,12 @@ namespace jQuery.Fill.Controllers
         }
 
 
-        public ActionResult File()
+        public ActionResult File(HttpPostedFileWrapper[] file, string name)
         {
 
 
 
-            return Json(new { forms = Request.Form.Count, hasFile = Request.Files.Count > 0, Request.Files[0].FileName, Request.Files[0].ContentLength }, JsonRequestBehavior.AllowGet);
+            return Json(new { forms = Request.Form.Count, hasFile = file.Length > 0, file[0].FileName, file[0].ContentLength });
         
         }
     }

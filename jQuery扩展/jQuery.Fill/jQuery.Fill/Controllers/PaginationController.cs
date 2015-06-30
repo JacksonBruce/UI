@@ -53,7 +53,7 @@ namespace jQuery.Fill.Controllers
         // GET: Pagination
         public ActionResult Index(int pageSize = 10, int pageIndex = 0, string sortExpression=null)
         {
-            System.Threading.Thread.Sleep(1000);
+            //System.Threading.Thread.Sleep(1000);
             var data = Book.CreateList(100);
             var total = data.Count();
 
