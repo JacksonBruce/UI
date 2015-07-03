@@ -8,64 +8,96 @@
 <body>
     <div class="container">
         <h1>上传进度条</h1>
-
-        <form>
+        <form action="/home/File">
             <div class="form-group">
                 <label>name:</label>
-                <input class="form-control" type="text" name="name" />
+                <input class="form-control" type="text" name="name" required />
             </div>
-            <!--<div class="form-group">
+            <div class="form-group">
                 <label>file:</label>
-                <input class="form-control" type="file" name="file" />
-            </div>-->
+                <input type="file" name="file" />
+            </div>
+
+            <label>上传进度：</label>
             <div class="progress">
-                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0">
+                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="-100" aria-valuemin="-100" aria-valuemax="100" style="width: 0">
                     <span class="sr-only">0% Complete (success)</span>
                 </div>
             </div>
+            <h4>用触发器实现</h4>
             <div class="clearfix">
-                <button type="button" class="btn">submit</button>
+                <button type="button" class="btn" data-toggle="action" data-target="form" data-progress=".progress" data-callback="function(e,a){ if(a.error){alert('出错了')}else{alert('成功了');} }">submit</button>
+            </div>
+            <br />
+            <div class="clearfix">
+                <button type="button" class="btn" data-toggle="action" data-target="form" data-progress="prog" data-callback="complete">submit（自定义函数）</button>
+            </div>
+
+            <h4>用脚本实现</h4>
+            <div class="clearfix">
+                <button type="button" id="submit" class="btn">submit</button>
             </div>
         </form>
     </div>
     <script src="Scripts/jquery-1.10.2.min.js"></script>
-    <script src="Scripts/jquery.fill.1.0.js"></script>
+    <script src="Scripts/bootstrap.min.js" async></script>
+    <script src="Scripts/jquery.validate.js" async ></script>
+    <script src="Scripts/jquery.fill.1.0-min.js" async></script>
     <script>
-        $(".btn").click(function () {
-            var s = $('form'), ms = s.modelState(), p = $('.progress-bar');
-            $.ajaxFormData('/home/File', {
-                data: ms.model
-                , progress:
-                    function (e, xhr) {
-                        var pe = e.loaded / e.total * 100;
-                        p.width(pe + '%').attr('aria-valuenow', pe).children('span').text(pe + '% Complete (success)');
-                        //total,loaded;
+        ///触发器中的自定义函数
+        function prog(e, xhr) {
+            var pe = e.loaded / e.total * 100, s = $(this), p = s.data('prog');
+            if (!p) { p = $('.progress-bar'); s.data('prog', p); p.parent().show(); }
+            p.width(pe + '%').attr('aria-valuenow', pe).children('span').text(pe + '% Complete (success)');
+        }
+        function complete(e, a) {
+            var s = $(this), p = s.data('prog');
+            setTimeout(function () { p.parent().hide();s.data('prog',null) },3000);
+            if (a.error) { alert('出错了') } else { alert('成功了'); }
+        }
+
+        ///用脚本实现
+        $(function () {
+            $("#submit").click(function () {
+                var btn = $(this), s = $('form'), ms = s.modelState(), p = $('.progress-bar');
+                if (ms.errors) return;
+                btn.button("loading");
+                p.parent().show();
+                $.ajaxFormData('/home/File', {
+                    data: ms.model
+                    , progress:
+                        function (e, xhr) {
+                            var pe = e.loaded / e.total * 100;
+                            p.width(pe + '%').attr('aria-valuenow', pe).children('span').text(pe + '% Complete (success)');
+                        }
+                    ,
+                    complete: function (xhr, txt, s) {
+                        btn.button('reset')
+                        console.debug('complete');
+                        console.debug(txt);
+                        console.debug(s);
+                        setTimeout(function () { p.parent().hide(); }, 3000);
                     }
-                ,
-                complete: function (xhr, txt, s) {
+                    ,
+                    success: function (d, state, xhr) {
 
-                    console.debug('complete');
-                    console.debug(txt);
-                    console.debug(s);
-                }
-                ,
-                success: function (d, state, xhr) {
+                        console.debug(d);
+                        console.debug(state);
+                        alert('success');
+                    }
+                    ,
+                    error: function (xhr, status, statusText) {
+                        console.debug('error:');
+                        console.debug(status);
+                        console.debug(statusText);
 
-                    console.debug(d);
-                    console.debug(state);
-                    alert('success');
-                }
-                ,
-                error: function (xhr,status,statusText) {
-                    console.debug('error:');
-                    console.debug(status);
-                    console.debug(statusText);
+                    }
 
-                }
+                })
 
-            })
-            
-        });
+            });
+
+        })
     </script>
 </body>
 </html>

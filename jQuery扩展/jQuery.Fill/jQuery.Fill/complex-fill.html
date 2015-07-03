@@ -34,7 +34,7 @@
             </form>
         </div>
         
-        <h2>填充树形对象</h2>
+        <h2>填充固定的树形对象</h2>
         <div id="tree">
             <ul>
                 <li>
@@ -68,8 +68,10 @@
     <script src="Scripts/jquery.fill.1.0.js"></script>
     <script>
         $("#hierarchy").fill({ Name: '深入理解Bootstrap', Author: { FirstName: '徐', LastName: '涛' } });
+        ///填充固定的树形对象
         $('#tree').fill({ Name: 'root', leaf: { Name: 'leaf-1', leaf: { Name: 'leaf-2', leaf: { Name: 'leaf-3' } } } });
 
+        ///树形列表数据
         var json = [
             {
                 Name: 'root-0',
@@ -161,15 +163,8 @@
         ];
 
 
-
+        ///填充树形对象
         $('#treeList').fill(json, { tree: true })
-
-
-
-
-
-
-
     </script>
 </body>
 </html>

@@ -114,11 +114,15 @@ namespace jQuery.Fill.Controllers
             return Json(entity);
         }
 
-        public ActionResult formPost(bool Gender, string name, string title, string date, int ID, Book book, int[] ListID,HttpPostedFileWrapper[] images)
+        public ActionResult formPost(bool Gender, string name, string title, string date, int ID, Book book)
         {
 
-            return Json(new { err=true,message="err" });
+            return Json(new { err=true,message="hhhh..." });
         }
+        //public ActionResult getForm()
+        //{
+        //    return Json(new { Gender = true, name = "jackson", title = "a monkey", date = DateTime.Now, book = new Book() { Author = "bruce", DateTime = DateTime.Now.AddDays(-50), ID = 4554, Name = "JS", Number = "SN4545", Publisher = "SB" } });
+        //}
 
 
         public ActionResult File(HttpPostedFileWrapper[] file, string name)
