@@ -54,7 +54,7 @@
 
     <script src="Scripts/jquery-1.10.2.min.js"></script>
     <script src="Scripts/jquery.validate.js" async></script>
-    <script src="Scripts/jquery.fill.1.0.js" async></script>
+    <script src="Scripts/jquery.fill.1.0-dev.js" async></script>
     <script>
         
         $(function () {
@@ -64,6 +64,7 @@
             })
             $('#btnSubmit').click(function () {
                 var frm = $('form'), ms = frm.modelState();
+                console.debug(ms);
                 ///如果没有错误
                 if (!ms.errors) {
                     //提交表单

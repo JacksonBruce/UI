@@ -105,13 +105,19 @@ namespace jQuery.Fill.Controllers
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public ActionResult post(KKK entity)
-        {
-            uint v=0xffffdb78;
-            int a = (int)v;
-            byte b = (byte)(a / 0x100);
+        //public ActionResult post(KKK entity)
+        //{
+        //    //uint v=0xffffdb78;
+        //    //int a = (int)v;
+        //    //byte b = (byte)(a / 0x100);
 
-            return Json(entity);
+        //    return Json(entity);
+        //}
+
+        public ActionResult post(int[] ids,DateTime create, List<Aa> children)
+        {
+
+            return Json(new { ids, create, children });
         }
 
         public ActionResult formPost(bool Gender, string name, string title, string date, int ID, Book book)
@@ -119,6 +125,16 @@ namespace jQuery.Fill.Controllers
 
             return Json(new { err=true,message="hhhh..." });
         }
+
+        //public ActionResult Post(int[] ids)
+        //{ 
+        
+        
+        
+        //}
+
+
+
         //public ActionResult getForm()
         //{
         //    return Json(new { Gender = true, name = "jackson", title = "a monkey", date = DateTime.Now, book = new Book() { Author = "bruce", DateTime = DateTime.Now.AddDays(-50), ID = 4554, Name = "JS", Number = "SN4545", Publisher = "SB" } });

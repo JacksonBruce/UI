@@ -1,9 +1,9 @@
-﻿
+﻿"use strict";
 
 (function ($) {
 
     function req(opt) { $.ajaxFormData(opt) }
-    function isBaseType(o) { return o === null || o instanceof Date || (t = typeof (o)) == "string" || t == "number" || t == "boolean" };
+    function isBaseType(o) { var t;return o === null || o instanceof Date || (t = typeof (o)) == "string" || t == "number" || t == "boolean" };
     function pars(str) {
         if (str) {
             var o;
