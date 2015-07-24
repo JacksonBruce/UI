@@ -196,14 +196,14 @@
                         fn.call(root, d);
                         ///分页器
                         if (p) {
-                            var p_sltr = p_opt.selector || '.pagination', el = root.find(p_sltr), dpn = "data-page", btns = p_opt.buttons, paging = p_opt.paging
+                            var p_sltr = p_opt.selector || '.pagination', el = (p_sltr instanceof jQuery)?p_sltr:root.find(p_sltr), dpn = "data-page", btns = p_opt.buttons, paging = p_opt.paging
                                 , total = gtp(p, ["total", "records"]), p_offset = p_opt.offset ? p_opt.offset : 0, p_index = gtp(p, ["index", "pageindex"]) - p_offset, p_next = p_index + 1, p_prev = p_index - 1, p_count = gtp(p, ["count", "pagecount"])
 
                                 , p_size;
 
                             if (total > 0 && (isNaN(p_count) || p_count <= 0)) {
                                 p_size = gtp(p, ["size", "pagesize"]);
-                                p_count = total / p_size + (total % p_size > 0 ? 1 : 0);
+                                p_count = Math.floor(total / p_size) + (total % p_size > 0 ? 1 : 0);
                             }
                             el.fill(p, opt);
                             if (p_count > 1) {
@@ -211,7 +211,7 @@
                                 if (!el.length) { el = $("<ul class='pagination'><li class='first'><a href='javascript:' aria-label='First'><span aria-hidden='true'>&laquo;</span></a></li><li class='number'><a href='javascript:'></a></li><li class='last'><a href='javascript:' aria-label='Last'><span aria-hidden='true'>&raquo;</span></a></li></ul>").appendTo(root); }
                                 if (!$.data(el[0], bindEventN)) {
                                     var ev = function () {
-                                        var s = $(this), n = Number(s.attr(dpn)), p_arg = { page: n, data: getPostParams(root, data), option: opt, cancel: false };
+                                        var s = $(this), n = Number(s.attr(dpn)), p_arg = { page: n, data:$.data(root[0], "postparams"), option: opt, cancel: false };
                                         if (typeof (paging) == fnstr) {
                                             paging.call(this, p_arg);
                                         }
@@ -222,9 +222,9 @@
                                             root.fill(url, p_arg.data, opt, cfn);
                                         }
                                     };
-                                    tmp = p_sltr + " a[" + dpn + "][" + dpn + "!='']";
-                                    if (el.live) { $(tmp, root).live("click", ev); }
-                                    else { root.on("click", tmp, ev); }
+                                    tmp =" a[" + dpn + "][" + dpn + "!='']";
+                                    if (el.live) { $(tmp,el).live("click", ev); }
+                                    else { el.on("click", tmp, ev); }
                                     $.data(el[0], bindEventN, true);
                                 }
                                 tmp = "disabled";
@@ -243,7 +243,7 @@
                                 if (tmp.length) {
                                     if (!btns || isNaN(btns) || btns <= 0) { btns = 10 }
                                     var p_end = p_index + Math.ceil(btns / 2), p_start, item_css = "item", active_css = p_opt.active || 'active';
-                                    if (p_end >= p_end) { p_end = p_count - 1; }
+                                    if (p_end >= p_count) { p_end = p_count - 1; }
                                     p_start = p_end - btns;
                                     if (p_start < 0) { p_start = 0 }
                                     tmp.hide().prevAll('[role="page-number"]').remove();
@@ -268,7 +268,7 @@
                                     if (!s.hasClass(currentCss)) { thead.find(sortItemSltr + "." + currentCss).removeClass(currentCss); s.addClass(currentCss) }
                                     else { s.toggleClass(desc) }
                                     sortValue = sortExp + (s.hasClass(desc) ? " desc" : "");
-                                    s_arg = { data: getPostParams(root, data), sortExpression: sortValue, option: opt, cancel: false };
+                                    s_arg = { data: $.data(root[0], "postparams"), sortExpression: sortValue, option: opt, cancel: false };
                                     if (handler) { handler.call(this, s_arg); }
                                     if (!s_arg.cancel) {
                                         if (!s_arg.data) { s_arg.data = {} }
@@ -461,12 +461,23 @@
             if ($.isPlainObject(url))
             { s = url; url = s.url; delete s.url; }
             if (!url) return;
-            if (!(s && window.FormData) || !s.data) {
+            if (s && s.data && window.FormData && !(s.data instanceof FormData)) { s.data = $.toNameValues(s.data); }
+            if (!(s && window.FormData) || !s.data || (!($.isFunction(s.progress) || s.data instanceof FormData))) {
+                if (!s) { s = {} }
+                if (!s.type) { s.type = 'POS' }
+                if ($.isFunction(s.success)) {
+                    s.success = (function (b) {
+                        return function (r, t, x) {
+                            if (!$.isPlainObject(r)) { try { eval('r=' + r) } catch (e) { } }
+                            b.call(this, r, t, x);
+                        }
+                    })(s.success)
+                }
                 $.ajax(url, s);
                 return;
             }
             if (!(s.data instanceof FormData))
-            { s.data = $.toNameValues(s.data, true)}
+            { s.data = $.toNameValues(s.data, true); }
             var xhr = new XMLHttpRequest(),self=this, ex = function (f) {
                 if (!$.isFunction(f)) return;
                 var a = arguments, p = [];

@@ -42,7 +42,8 @@
     <script src="Scripts/jquery-1.10.2.min.js"></script>
     <script src="Scripts/bootstrap.min.js" async></script>
     <script src="Scripts/jquery.validate.js" async ></script>
-    <script src="Scripts/jquery.fill.1.0-dev.js" async></script>
+    <!--<script src="Scripts/jquery.fill.1.0-dev.js" async></script>-->
+    <script src="Scripts/jquery.fill.1.0.js"></script>
     <script>
         ///触发器中的自定义函数
         function prog(e, xhr) {
@@ -65,11 +66,11 @@
                 p.parent().show();
                 $.ajaxFormData('/home/File', {
                     data: ms.model
-                    , progress:
-                        function (e, xhr) {
-                            var pe = e.loaded / e.total * 100;
-                            p.width(pe + '%').attr('aria-valuenow', pe).children('span').text(pe + '% Complete (success)');
-                        }
+                    //, progress:
+                    //    function (e, xhr) {
+                    //        var pe = e.loaded / e.total * 100;
+                    //        p.width(pe + '%').attr('aria-valuenow', pe).children('span').text(pe + '% Complete (success)');
+                    //    }
                     ,
                     complete: function (xhr, txt, s) {
                         btn.button('reset')

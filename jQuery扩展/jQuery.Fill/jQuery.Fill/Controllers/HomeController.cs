@@ -143,10 +143,10 @@ namespace jQuery.Fill.Controllers
 
         public ActionResult File(HttpPostedFileWrapper[] file, string name)
         {
+            //return Content(name);
+            return Content("{\"dd\":\"" + HttpUtility.JavaScriptStringEncode(name) + "\"}");
 
-
-
-            return Json(new { forms = Request.Form.Count, hasFile = file.Length > 0, file[0].FileName, file[0].ContentLength });
+            //return Json(new { forms = Request.Form.Count, Request.Form, name=name, hasFile = file != null && file.Length > 0, FileName = file != null && file.Length > 0 ? file[0].FileName : string.Empty, ContentLength = file != null && file.Length > 0 ? file[0].ContentLength : 0 });
         
         }
     }
