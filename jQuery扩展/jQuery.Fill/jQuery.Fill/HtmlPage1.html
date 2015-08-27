@@ -211,6 +211,26 @@
             };
             $.ajax({ url: "/home/Post", type: "POST", data: $.toNameValues(model) })
         });
+
+        //var obj = { a: 1, b: function () { console.log(this.a) } };
+        //var a = 2;
+        //var b = obj.b;
+        //obj.b();// 1;
+        //b();//?
+        //obj.b.call(window);// 2
+
+        //console.log(1 && 2);//2
+
+        function A() { }
+        function B(a) { this.a = a }
+        function C(a) { if (a) { this.a = a; } }
+        A.prototype.a = 1;
+        B.prototype.a = 1;
+        C.prototype.a = 1;
+        console.log(new A());
+        console.log(new B());
+        console.log(new C(2));
+
     </script>
 </body>
 

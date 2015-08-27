@@ -461,10 +461,11 @@
             if ($.isPlainObject(url))
             { s = url; url = s.url; delete s.url; }
             if (!url) return;
-            if (s && s.data && window.FormData && !(s.data instanceof FormData)) { s.data = $.toNameValues(s.data); }
+            //if (s && s.data && window.FormData && !(s.data instanceof FormData)) { s.data = $.toNameValues(s.data); }
             if (!(s && window.FormData) || !s.data || (!($.isFunction(s.progress) || s.data instanceof FormData))) {
                 if (!s) { s = {} }
-                if (!s.type) { s.type = 'POS' }
+                else if (s.data) { s.data = $.toNameValues(s.data)}
+                if (!s.type) { s.type = 'POST' }
                 if ($.isFunction(s.success)) {
                     s.success = (function (b) {
                         return function (r, t, x) {
@@ -536,7 +537,7 @@
                     valid = pars(e.attr('data-valid') || s.attr('data-valid')), ms;
                 if (!s.length) return;
                 if (!(ms = $.isPlainObject(valid) ? s.modelState(valid) : s.modelState()).errors) {
-                    var m = ms.model, params = parsePostParams(e), reset, result = null, err = null, prog_pnl = e.attr('data-progress'), prog = pars(prog_pnl);
+                    var m = ms.model, params = parsePostParams(e), reset, result = null, err = null, prog_pnl=null, prog = e.data('progress') || pars(prog_pnl = e.attr('data-progress'));
                     if (params && $.isPlainObject(params)) { for (var i in m) { params[i] = m[i] } }
                     else { params = m }
                     if ($.isFunction(e.button)) { e.button('loading'); reset = true }
@@ -560,13 +561,13 @@
                         prog = function (a, b) { progFn(a.loaded / a.total * 100); }
                     }
                     $.ajaxFormData(u, {
-                        data: $.toNameValues(params),
-                        progress: function (a, b) { if ($.isFunction(prog)) { prog.call(e, a, b) } },
+                        data: params,
+                        progress:$.isFunction(prog)?function (a, b) {prog.call(e, a, b)}:null,
                         success: function (json) { result = json; },
                         error: function (req, ts, et) { err = { req: req, textStatus: ts, errorThrown: et } },
                         complete: function () {
                             if (reset === true) { e.button('reset') }
-                            var b = pars(e.attr('data-callback')), arg = { cancel: false, error: err, context: s, posted: params };
+                            var dcbn = 'callback', b = e.data(dcbn) || pars(e.attr('data-' + dcbn)), arg = { cancel: false, error: err, context: s, posted: params };
                             if ($.isFunction(b)) { b.call(e[0], result, arg); }
                             if (!arg.cancel) {
                                 if (!err) { s.clearModel() }

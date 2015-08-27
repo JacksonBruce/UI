@@ -100,6 +100,10 @@ namespace jQuery.Fill.Controllers
 
         }
 
+        public ActionResult Test(int w, int h=0) {
+           return Content("ok");
+
+        }
         /// <summary>
         /// 模型绑定器测试
         /// </summary>
