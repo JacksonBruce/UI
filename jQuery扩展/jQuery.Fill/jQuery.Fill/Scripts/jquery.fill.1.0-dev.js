@@ -31,7 +31,7 @@
                     , arg = { item: o, path: path, propertyName: propertyName }, fn = opt && opt.formater
                     , rgx, m;
 
-                if (v === null && (p = n.attr(p))) { v = p }
+                if (v === null) { v = n.attr(p) || null; }
                 else if (typeof (v) == "string" && (m = (/Date\((-?\d+)\)/).exec(v))) {
                     v = new Date(parseInt(m[1]))
                 }
@@ -284,14 +284,16 @@
                                 }
                                 $.data(root[0], bindEventN, true);
                             }
-
-
-
-
                         }
                     }
                 }
-                if (opt && $.isFunction(opt.complete)) { opt.complete.call(root, d) }
+                if (opt && $.isFunction(opt.complete)) {
+                    opt.complete.call(root, d);
+                    var empty = root.find('.empty-data');
+                    if (empty.length) {
+                        empty.toggle(!(d && d.length > 0));
+                    }
+                }
             };
 
             if (typeof (url) != "string") {

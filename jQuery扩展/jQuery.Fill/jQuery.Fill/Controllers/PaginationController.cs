@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
 using System.Web.Mvc;
+using System.Reflection;
 
 namespace jQuery.Fill.Controllers
 {
@@ -61,7 +62,9 @@ namespace jQuery.Fill.Controllers
             {
                 data = CreateOrderByQuery<Book>(data.AsQueryable(), sortExpression);
             }
+           
 
+            //return Json(new { rows = new object[0], pager = new { } });
             return Json(new { rows = data.Skip(pageSize * pageIndex).Take(pageSize), pager = new { pageIndex = pageIndex, pageSize = pageSize, total, pageCount = total / pageSize + (total % pageSize > 0 ? 1 : 0) } });
         }
     }
