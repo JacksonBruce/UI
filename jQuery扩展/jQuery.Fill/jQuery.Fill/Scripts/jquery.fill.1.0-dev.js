@@ -29,7 +29,7 @@
                 var tag = n.tagName
                     , pr = (n = $(n)).attr("data-property")
                     , arg = { item: o, path: path, propertyName: propertyName }
-                    , fn = opt && opt.formater
+                    , fn = opt && opt.formatter
                     , v = vl
                     , rgx, m;
 
