@@ -132,6 +132,7 @@
                     if ((f = e.children("." + (cs = "template"))).length || (f = e.find("." + cs)).length) {
                         ///如果不是追加，那么移除已填充的项
                         if (!(opt && opt.append)) { f.prevAll("." + ics).remove() }
+                        var els = [];
                         $.each(x, function (i, n) {
                             var el = f.hide().clone().removeClass(cs).addClass(ics).css({ display: "" });
                             if (opt && $.isFunction(opt.creating)) {
@@ -139,8 +140,10 @@
                                 opt.creating.call(e, craArg, el);
                                 if (craArg.cancel) return;
                             }
-                            fn.call(el.insertBefore(f), n, path, x, '[]', i);
-                        })
+                            fn.call(el, n, path, x, '[]', i);
+                            els.push(el);
+                        });
+                        for (var i = 0; i < els.length; i++) els[i].insertBefore(f);
                     }
                     return
                 }
