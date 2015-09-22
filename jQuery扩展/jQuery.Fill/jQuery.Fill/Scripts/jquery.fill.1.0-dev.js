@@ -22,13 +22,15 @@
     }
     /// json填充扩展
     (function () {
-        function setValue(e, v, o, path, opt, propertyName) {
+        function setValue(e, vl, o, path, opt, propertyName) {
             var p = "data-defaultValue";
 
             $.each(e, function (i, n) {
                 var tag = n.tagName
                     , pr = (n = $(n)).attr("data-property")
-                    , arg = { item: o, path: path, propertyName: propertyName }, fn = opt && opt.formater
+                    , arg = { item: o, path: path, propertyName: propertyName }
+                    , fn = opt && opt.formater
+                    , v = vl
                     , rgx, m;
 
                 if (v === null) { v = n.attr(p) || null; }
