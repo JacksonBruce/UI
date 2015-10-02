@@ -574,10 +574,14 @@
                         error: function (req, ts, et) { err = { req: req, textStatus: ts, errorThrown: et } },
                         complete: function () {
                             if (reset === true) { e.button('reset') }
-                            var dcbn = 'callback', b = e.data(dcbn) || pars(e.attr('data-' + dcbn)), arg = { cancel: false, error: err, context: s, posted: params };
+                            var dcbn = 'callback', b = e.data(dcbn) //|| pars(e.attr('data-' + dcbn))
+                                , arg = { cancel: false, error: err, context: s, posted: params };
+                            if (typeof (b) === "string") { b = pars(b); }
                             if ($.isFunction(b)) { b.call(e[0], result, arg); }
                             if (!arg.cancel) {
+
                                 if (!err) { s.clearModel() }
+                                
                                 if (prog_pnl instanceof jQuery) { setTimeout(function () { prog_pnl.hide(); }, 2000) }
                             }
                         }
