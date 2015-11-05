@@ -468,10 +468,13 @@
             if ($.isPlainObject(url))
             { s = url; url = s.url; delete s.url; }
             if (!url) return;
-            //if (s && s.data && window.FormData && !(s.data instanceof FormData)) { s.data = $.toNameValues(s.data); }
-            if (!(s && window.FormData) || !s.data || (!($.isFunction(s.progress) || s.data instanceof FormData))) {
+            var isFD=false;
+            if (s && s.data && window.FormData && !(isFD=(s.data instanceof FormData))) { 
+                s.data = $.toNameValues(s.data); 
+                isFD=(s.data instanceof FormData)
+            }
+            if (!s || !window.FormData || !s.data || (!isFD && !$.isFunction(s.progress))) {
                 if (!s) { s = {} }
-                else if (s.data) { s.data = $.toNameValues(s.data)}
                 if (!s.type) { s.type = 'POST' }
                 if ($.isFunction(s.success)) {
                     s.success = (function (b) {
@@ -484,7 +487,7 @@
                 $.ajax(url, s);
                 return;
             }
-            if (!(s.data instanceof FormData))
+            if (!isFD)
             { s.data = $.toNameValues(s.data, true); }
             var xhr = new XMLHttpRequest(),self=this, ex = function (f) {
                 if (!$.isFunction(f)) return;
