@@ -3,7 +3,7 @@
 (function ($) {
 
     function req(opt) { $.ajaxFormData(opt) }
-    function isBaseType(o) { var t;return o === null || o instanceof Date || (t = typeof (o)) == "string" || t == "number" || t == "boolean" };
+    function isBaseType(o) { var t; return o === null || o instanceof Date || (t = typeof (o)) == "string" || t == "number" || t == "boolean" };
     function pars(str) {
         if (str) {
             var o;
@@ -17,14 +17,23 @@
         if (!s.length || $.isPlainObject(d)) return d;
         var k = "postparams";
         d = $.data(s[0], k);
-        if (!$.isPlainObject(d)) { d = parsePostParams(s);if(!$.isPlainObject(d)) {d = {}}}
+        if (!$.isPlainObject(d)) { d = parsePostParams(s); if (!$.isPlainObject(d)) { d = {} } }
         return d;
     }
     /// json填充扩展
     (function () {
         function setValue(e, vl, o, path, opt, propertyName) {
             var p = "data-defaultValue";
-
+            var cfn = opt && opt.columns && opt.columns[path];
+            if (!$.isFunction(cfn)) {
+                cfn = (function (p) {
+                    return function (v, arg) {
+                        if (p == null) return v;
+                        if (isBaseType(p)) { return v || p; }
+                        return p[v];
+                    }
+                })(cfn);
+            }
             $.each(e, function (i, n) {
                 var tag = n.tagName
                     , pr = (n = $(n)).attr("data-property")
@@ -34,13 +43,16 @@
                     , rgx, m;
 
                 if (v === null) { v = n.attr(p) || null; }
-                else if (typeof (v) == "string" && (m = (/Date\((-?\d+)\)/).exec(v))) {
-                    v = new Date(parseInt(m[1]))
+                else if (typeof (v) == "string") {
+                    if ((m = (/Date\((-?\d+)\)/).exec(v))) { v = new Date(parseInt(m[1])) }
+                    else if ((/^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}(\s\d{1,2}(:\d{1,2}){1,2})$/).test(v)) {
+                        v = new Date(v.replace(/\-/g, '/'));
+                    }
                 }
-
                 if ($.isFunction(fn)) {
                     v = fn.call(n, v, arg)
                 }
+                v = cfn.call(n, v, arg);
                 if (v instanceof Date) {
                     var fm = n.attr("data-dateFormat"), wday;
                     // v=new Date();
@@ -50,7 +62,20 @@
                             m = (m = m[1].split(",")).length == 7 ? m[wday] : "";
                             fm = fm.replace(rgx, m);
                         }
-                        v = fm.replace(/\{yyyy\}/g, v.getFullYear()).replace(/\{MM\}/g, v.getMonth() + 1).replace(/\{dd\}/g, v.getDate()).replace(/\{mm\}/g, v.getMinutes()).replace(/\{hh\}/, v.getHours()).replace(/\{ss\}/g, v.getSeconds())
+
+                        v = (function (str, arr) {
+                            for (var i = 0; i < arr.length; i++) {
+                                var o = arr[i], num = o[1];
+                                str = str.replace(o[0], (num < 10 ? '0' : '') + num);
+                            }
+                            return str;
+                        })(fm, [[/\{yyyy\}/g, v.getFullYear()],
+                            [/\{MM\}/g, v.getMonth() + 1],
+                            [/\{dd\}/g, v.getDate()],
+                            [/\{hh\}/g, v.getHours()],
+                            [/\{mm\}/g, v.getMinutes()],
+                            [/\{ss\}/g, v.getSeconds()]
+                        ]);
                     }
                     else {
                         v = v.toLocaleString()
@@ -69,28 +94,30 @@
                     else { n[0].checked = n.val() == v + "" }
                 }
                 else if (n.is("input,textarea,select")) { n.val(v) }
-                else if (tag == "TEXT" || n.attr("data-replace") !== undefined) { n.replaceWith(v+'') }
+                else if (tag == "TEXT" || n.attr("data-replace") !== undefined) { n.replaceWith(v + '') }
                 else if (tag == "IMG") { n.attr("src", v); }
                 else if (!n.children().length) { n.text(v) }
             })
         }
 
         $.prototype.fill = function (url, data, opt, cfn) {
-            var fnstr = "function", tmp, root = $(this), callFilling = function (opt, arg, x) {
-                var f, pn;
-                if (opt && $.isFunction (f = opt.filling))
-                { f.call(root,x, arg) }
-                if (opt && opt.tree === true && (x instanceof Array) && x.length && (pn = arg.propertyName) && (pn == opt.children || pn.toLowerCase() == "children")) {
-                    var creArg = { cancel: false, target: arg.target, children: x, item: arg.item };
-                    if ($.isFunction(f = opt.creatingNodes)) {
-                        f.call(root, creArg);
-                    }
-                    if (!creArg.cancel) {
-                        var t = arg.target, tg = t.parent()[0].tagName;
-                        t.addClass("has-children").next().clone().appendTo("<" + tg + "></" + tg + ">").parent().appendTo(t);
+            var fnstr = "function", tmp, root = $(this),
+                filter = function (d) { return d; },
+                callFilling = function (opt, arg, x) {
+                    var f, pn;
+                    if (opt && $.isFunction(f = opt.filling))
+                    { f.call(root, x, arg) }
+                    if (opt && opt.tree === true && (x instanceof Array) && x.length && (pn = arg.propertyName) && (pn == opt.children || pn.toLowerCase() == "children")) {
+                        var creArg = { cancel: false, target: arg.target, children: x, item: arg.item };
+                        if ($.isFunction(f = opt.creatingNodes)) {
+                            f.call(root, creArg);
+                        }
+                        if (!creArg.cancel) {
+                            var t = arg.target, tg = t.parent()[0].tagName;
+                            t.addClass("has-children").next().clone().appendTo("<" + tg + "></" + tg + ">").parent().appendTo(t);
+                        }
                     }
                 }
-            }
             , fn = function (x, path, obj, propertyName, index) {
 
                 var self = this, f, cs
@@ -113,7 +140,7 @@
                         return t
                     }
                 , e = path ? find(path) : self;
-                if (!e || e.length == 0) { e = (e = find(propertyName?propertyName:(arr=path.split("."))[arr.length - 1])).length ? e : self }
+                if (!e || e.length == 0) { e = (e = find(propertyName ? propertyName : (arr = path.split("."))[arr.length - 1])).length ? e : self }
 
                 arg.target = e;
                 callFilling(opt, arg, x);
@@ -128,22 +155,31 @@
                 }
                 ///填充列表数据
                 if (x instanceof Array) {
-                    var v, ics = "fill-item";
-                    if ((f = e.children("." + (cs = "template"))).length || (f = e.find("." + cs)).length) {
+                    var v, ics = "fill-item", templateContainer, intopoint;
+                    if ((f = e.data('fill-template')) || (f = e.children("." + (cs = "template"))).length || (f = e.find("." + cs)).length) {
+                        if (!e.data('fill-template')) {
+                            e.data('fill-template-container', templateContainer = f.parent());
+                            e.data('fill-template', f);
+                            if (f.next().length) { e.data('fill-template-intopoint', intopoint = f.next()); }
+                            f.remove().removeClass(cs).addClass(ics);
+                        } else { templateContainer = e.data('fill-template-container'); intopoint = e.data('fill-template-intopoint'); }
                         ///如果不是追加，那么移除已填充的项
-                        if (!(opt && opt.append)) { f.prevAll("." + ics).remove() }
+                        if (!(opt && opt.append)) { templateContainer.children('.' + ics).remove(); }
                         var els = [];
                         $.each(x, function (i, n) {
-                            var el = f.hide().clone().removeClass(cs).addClass(ics).css({ display: "" });
-                            if (opt && $.isFunction(opt.creating)) {
-                                var craArg = { cancel: false, item: n, index: i };
-                                opt.creating.call(e, craArg, el);
-                                if (craArg.cancel) return;
+                            if (n) {
+                                var el = f.clone();
+                                if (opt && $.isFunction(opt.creating)) {
+                                    var craArg = { cancel: false, item: n, index: i, path: path };
+                                    opt.creating.call(e, craArg, el);
+                                    if (craArg.cancel) return;
+                                }
+                                fn.call(el, n, path, x, '[]', i);
+                                els.push(el);
                             }
-                            fn.call(el, n, path, x, '[]', i);
-                            els.push(el);
                         });
-                        for (var i = 0; i < els.length; i++) els[i].insertBefore(f);
+                        if (intopoint) { for (var i = 0; i < els.length; i++) els[i].insertBefore(intopoint) }
+                        else { templateContainer.append(els); }
                     }
                     return
                 }
@@ -193,21 +229,29 @@
                         if (p_opt) {
                             var rows;
                             if ((p = (typeof (p_opt.prop) == "string" ? gtp(d, p_opt.prop, true) : null) || gtp(d, ["page", "pager", "paging", "pagination"]))
-                                && (rows = (typeof (p_opt.rows) == "string" ? gtp(d, p_opt.rows, true) : null) || gtp(d, ["data", "rows", "list", "array", "collection"])) instanceof Array) {
+                                && (rows = (typeof (p_opt.rows) == "string" ? gtp(d, p_opt.rows, true) : null) || gtp(d, ["data", 'items', "rows", "list", "array", "collection"])) instanceof Array) {
                                 d = rows
                             }
                         }
-                        if (!d || (d instanceof Array && d.length == 0)) { emptyData.show(); root.find(".template").hide() } else { emptyData.hide() }
+                        if (!d || (d instanceof Array && d.length == 0)) { emptyData.show(); } else { emptyData.hide() }
                         fn.call(root, d);
+
                         ///分页器
                         if (p) {
-                            var p_sltr = p_opt.selector || '.pagination', el = (p_sltr instanceof jQuery)?p_sltr:root.find(p_sltr), dpn = "data-page", btns = p_opt.buttons, paging = p_opt.paging
-                                , total = gtp(p, ["total", "records"]), p_offset = p_opt.offset ? p_opt.offset : 0, p_index = gtp(p, ["index", "pageindex"]) - p_offset, p_next = p_index + 1, p_prev = p_index - 1, p_count = gtp(p, ["count", "pagecount"])
-
-                                , p_size;
+                            var p_sltr = p_opt.selector || '.pagination',
+                                indexName = p_opt.indexName || "pageindex",
+                                el = (p_sltr instanceof jQuery) ? p_sltr : root.find(p_sltr), dpn = "data-page",
+                                btns = p_opt.buttons, paging = p_opt.paging,
+                                total = gtp(p, ["total", "records"]),
+                                p_offset = p_opt.offset ? p_opt.offset : 0,
+                                p_index = (function () { var i = gtp(p, ["index", indexName]) - p_offset; if (i < 0) { i = 0; } return i })(),
+                                p_next = p_index + 1,
+                                p_prev = p_index - 1,
+                                p_count = gtp(p, ["count", "pagecount"]),
+                                p_size;
 
                             if (total > 0 && (isNaN(p_count) || p_count <= 0)) {
-                                p_size = gtp(p, ["size", "pagesize"]);
+                                p_size = gtp(p, ["size", "pagesize"]) || 10;
                                 p_count = Math.floor(total / p_size) + (total % p_size > 0 ? 1 : 0);
                             }
                             el.fill(p, opt);
@@ -216,19 +260,19 @@
                                 if (!el.length) { el = $("<ul class='pagination'><li class='first'><a href='javascript:' aria-label='First'><span aria-hidden='true'>&laquo;</span></a></li><li class='number'><a href='javascript:'></a></li><li class='last'><a href='javascript:' aria-label='Last'><span aria-hidden='true'>&raquo;</span></a></li></ul>").appendTo(root); }
                                 if (!$.data(el[0], bindEventN)) {
                                     var ev = function () {
-                                        var s = $(this), n = Number(s.attr(dpn)), p_arg = { page: n, data:$.data(root[0], "postparams"), option: opt, cancel: false };
+                                        var s = $(this), n = Number(s.attr(dpn)), p_arg = { page: n, data: $.data(root[0], "postparams"), container: root, option: opt, cancel: false };
                                         if (typeof (paging) == fnstr) {
                                             paging.call(this, p_arg);
                                         }
                                         if (!p_arg.cancel) {
                                             if (!p_arg.data) { p_arg.data = {} }
-                                            p_arg.data["pageindex"] = n;
+                                            p_arg.data[indexName] = n;
                                             if (typeof (url) != "string") { url = root.attr("data-src") }
                                             root.fill(url, p_arg.data, opt, cfn);
                                         }
                                     };
-                                    tmp =" a[" + dpn + "][" + dpn + "!='']";
-                                    if (el.live) { $(tmp,el).live("click", ev); }
+                                    tmp = " a[" + dpn + "][" + dpn + "!='']";
+                                    if (el.live) { $(tmp, el).live("click", ev); }
                                     else { el.on("click", tmp, ev); }
                                     $.data(el[0], bindEventN, true);
                                 }
@@ -247,17 +291,22 @@
                                 tmp = el.find(".number");
                                 if (tmp.length) {
                                     if (!btns || isNaN(btns) || btns <= 0) { btns = 10 }
-                                    var p_end = p_index + Math.ceil(btns / 2), p_start, item_css = "item", active_css = p_opt.active || 'active';
+                                    var p_end = p_index + Math.floor(btns / 2), p_start, item_css = "item", active_css = p_opt.active || 'active';
                                     if (p_end >= p_count) { p_end = p_count - 1; }
-                                    p_start = p_end - btns;
-                                    if (p_start < 0) { p_start = 0 }
+                                    p_start = p_end + 1 - btns;
+                                    if (p_start < 0) {
+                                        p_end += 0 - p_start;
+                                        if (p_end >= p_count) { p_end = p_count - 1; }
+                                        p_start = 0;
+                                    }
+
                                     tmp.hide().prevAll('[role="page-number"]').remove();
                                     for (var i = p_start; i <= p_end; i++) {
                                         var clone = tmp.clone().removeClass('number').css('display', '').addClass(item_css).attr('role', 'page-number').insertBefore(tmp), link = clone.find('a');
-                                        if (!link.length) { link = clone;}
+                                        if (!link.length) { link = clone; }
                                         link.text(i + 1);
                                         if (p_index == i) { clone.addClass(active_css) }
-                                        else { link.attr(dpn, i + p_offset)}
+                                        else { link.attr(dpn, i + p_offset) }
                                     }
 
                                 }
@@ -321,12 +370,13 @@
                     $.data(root[0], "postparams", data);
                 }
                 var loading = opt ? opt.loading : null;
+                if (opt && $.isFunction(opt.filter)) { filter = opt.filter; }
                 req({
                     url: url
                     , type: "POST"
                     , dataType: "json"
                     , data: $.toNameValues(data)
-                    , success: function (d) { fi(d) }
+                    , success: function (d) { fi(filter.call(root, d, opt, data)) }
                     , complete: function () { if (loading.length) { loading.hide(); } }
                     , beforeSend: function () { loading = (loading ? $(loading) : root.find(".loading")).show(); }
                 })
@@ -375,7 +425,7 @@
                         fn = a ? a[n] : null;
                         if ($.isFunction(fn)) {
                             var arg = { element: j, errors: lbls, value: v };
-                            err = fn.call(s, v, arg)===false || err;
+                            err = fn.call(s, v, arg) === false || err;
                             v = arg.value;
                             if (arg.errors && !lbls)
                             { lbls = arg.errors }
@@ -424,7 +474,7 @@
 
     $.extend({
         ///将模型转换成键值对字典。提交复杂的数据模型，转换成键值对，服务端可以直接使用mvc的默认模型绑定器
-        toNameValues: function (m,IFD) {
+        toNameValues: function (m, IFD) {
             var win = window,
                 filelist = win.FileList,
                 blob = win.Blob,
@@ -468,10 +518,10 @@
             if ($.isPlainObject(url))
             { s = url; url = s.url; delete s.url; }
             if (!url) return;
-            var isFD=false;
-            if (s && s.data && window.FormData && !(isFD=(s.data instanceof FormData))) { 
-                s.data = $.toNameValues(s.data); 
-                isFD=(s.data instanceof FormData)
+            var isFD = false;
+            if (s && s.data && window.FormData && !(isFD = (s.data instanceof FormData))) {
+                s.data = $.toNameValues(s.data);
+                isFD = (s.data instanceof FormData)
             }
             if (!s || !window.FormData || !s.data || (!isFD && !$.isFunction(s.progress))) {
                 if (!s) { s = {} }
@@ -479,7 +529,7 @@
                 if ($.isFunction(s.success)) {
                     s.success = (function (b) {
                         return function (r, t, x) {
-                            if (!$.isPlainObject(r)) { try { eval('r=' + r) } catch (e) { } }
+                            if (!$.isPlainObject(r)) { try { r = $.parseJSON(r) } catch (e) { } }
                             b.call(this, r, t, x);
                         }
                     })(s.success)
@@ -489,7 +539,7 @@
             }
             if (!isFD)
             { s.data = $.toNameValues(s.data, true); }
-            var xhr = new XMLHttpRequest(),self=this, ex = function (f) {
+            var xhr = new XMLHttpRequest(), self = this, ex = function (f) {
                 if (!$.isFunction(f)) return;
                 var a = arguments, p = [];
                 if (a.length > 1) {
@@ -504,7 +554,7 @@
                 if (xhr.readyState == 4) {
                     r = xhr.responseText;
                     if (s.dataFilter) { r = ex(s.dataFilter, r, s.dataType) }
-                    else { try { r = $.parseJSON(r) } catch (x) {} }
+                    else { try { r = $.parseJSON(r) } catch (x) { } }
                     if (xhr.status == 200) { ex(s.success, r, xhr.statusText, xhr); }
                     else { ex(s.error, xhr, xhr.status, xhr.statusText); }
                     ex(s.complete, xhr, xhr.statusText, xhr.status);
@@ -512,7 +562,7 @@
             }, false);
 
             xhr.upload.addEventListener("progress", function (e) { ex(s.progress, e, xhr) }, false);
-            xhr.open("post", url,  s.async!==false);
+            xhr.open("post", url, s.async !== false);
             if (s.headers) {
                 for (var i in s.headers) {
                     xhr.setRequestHeader(i, s.headers[i])
@@ -547,7 +597,7 @@
                     valid = pars(e.attr('data-valid') || s.attr('data-valid')), ms;
                 if (!s.length) return;
                 if (!(ms = $.isPlainObject(valid) ? s.modelState(valid) : s.modelState()).errors) {
-                    var m = ms.model, params = parsePostParams(e), reset, result = null, err = null, prog_pnl=null, prog = e.data('progress') || pars(prog_pnl = e.attr('data-progress'));
+                    var m = ms.model, params = parsePostParams(e), reset, result = null, err = null, prog_pnl = null, prog = e.data('progress') || pars(prog_pnl = e.attr('data-progress'));
                     if (params && $.isPlainObject(params)) { for (var i in m) { params[i] = m[i] } }
                     else { params = m }
                     if ($.isFunction(e.button)) { e.button('loading'); reset = true }
@@ -572,7 +622,7 @@
                     }
                     $.ajaxFormData(u, {
                         data: params,
-                        progress:$.isFunction(prog)?function (a, b) {prog.call(e, a, b)}:null,
+                        progress: $.isFunction(prog) ? function (a, b) { prog.call(e, a, b) } : null,
                         success: function (json) { result = json; },
                         error: function (req, ts, et) { err = { req: req, textStatus: ts, errorThrown: et } },
                         complete: function () {
@@ -584,7 +634,7 @@
                             if (!arg.cancel) {
 
                                 if (!err) { s.clearModel() }
-                                
+
                                 if (prog_pnl instanceof jQuery) { setTimeout(function () { prog_pnl.hide(); }, 2000) }
                             }
                         }
