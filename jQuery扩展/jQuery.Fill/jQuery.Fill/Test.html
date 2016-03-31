@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+    <textarea id="txt" style="width:300px;height:200px;"></textarea>
+    <div>
+        <button onclick="send(document.getElementById('txt').value)">提交</button>
+    </div>
+    <div>
+        <h4>响应内容：</h4>
+        <pre id="content"></pre>
+    </div>
+    <div>
+        <h4>响应码：</h4>
+        <pre id="code"></pre>
+    </div>
+    <div>
+        <h4>状态说明：</h4>
+        <pre id="statusText"></pre>
+    </div>
+
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+
+<script>
+    var a = $.ajax({
+        url: '/home/JsonTest', error: function () {
+            console.log(this);
+            console.log(arguments);
+        }
+    });
+    console.log(a);
+    var x;
+    function send(txt) {
+        var xhr = new XMLHttpRequest(), r;
+        //xhr.addEventListener("error", function (e) {
+        //    console.log('error:')
+        //    console.log(e);
+        //}, false);
+        x = xhr;
+
+        xhr.addEventListener("readystatechange", function () {
+            if (xhr.readyState == 4) {
+                console.log(xhr.responseType);
+                document.getElementById("content").innerHTML = xhr.responseText;
+                document.getElementById("code").innerHTML = xhr.status;
+                document.getElementById("statusText").innerHTML = xhr.statusText;
+            }
+        }, false);
+        //xhr.upload.addEventListener("progress", function (e) { console.log(e) }, false);
+        xhr.open("post", '/home/JsonTest', true);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.send(txt);
+    }
+</script>
+</body>
+</html>

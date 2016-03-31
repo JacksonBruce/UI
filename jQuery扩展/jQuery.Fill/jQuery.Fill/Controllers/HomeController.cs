@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,6 +28,33 @@ namespace jQuery.Fill.Controllers
 
     public class HomeController : Controller
     {
+        public ActionResult JsonTest()
+        {
+            
+            if (Request.InputStream.Length > 0)
+            {
+                using (System.IO.StreamReader sr = new System.IO.StreamReader(Request.InputStream))
+                {
+                    string str = sr.ReadToEnd();
+                    try
+                    {
+                        dynamic dd = JsonConvert.DeserializeObject(str);
+                        return Json(new { dd.KKK,a=dd.KKK.ewe });
+                       
+                    }
+                    catch {
+                        Response.StatusCode = 500;
+                        Response.StatusDescription = "不是有效的json格式";
+                        return Content(str);
+                    }
+                }
+
+            }
+
+            Response.StatusCode = 500;
+            Response.StatusDescription = "请提交json格式的字符串";
+            return Content("没有内容");
+        }
         public ActionResult Index()
         {
 
@@ -129,7 +158,11 @@ namespace jQuery.Fill.Controllers
 
             return Json(new { err=true,message="hhhh..." });
         }
-
+        [HttpPost]
+        public ActionResult KKKKK(string name)
+        {
+            return Content(name);
+        }
         //public ActionResult Post(int[] ids)
         //{ 
         

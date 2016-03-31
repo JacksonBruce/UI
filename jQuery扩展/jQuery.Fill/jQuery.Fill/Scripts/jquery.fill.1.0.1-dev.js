@@ -3,8 +3,8 @@
 "use strict";
 
 (function ($) {
-    
-    function req(opt) { $.ajaxFormData(opt) }
+
+    function req(opt) { return $.ajaxFormData(opt) }
     function isBaseType(o) { var t; return o === null || o instanceof Date || (t = typeof (o)) == "string" || t == "number" || t == "boolean" };
     function pars(str) {
         if (str) {
@@ -17,10 +17,9 @@
     function parsePostParams(e) { var p = null; if (!$.isPlainObject(p = pars(e.attr("data-postparams")))) { if ($.isFunction(p)) { p = p.call(e) } else if (p instanceof jQuery) { p = p.modelState().model; } } return p; }
     function getPostParams(s, d) {
         var c = getContext(s);
-        if (!$.isPlainObject(d) && !$.isPlainObject(d = c.postparams) && !$.isPlainObject(d = parsePostParams(s)))
-        {
+        if (!$.isPlainObject(d) && !$.isPlainObject(d = c.postparams) && !$.isPlainObject(d = parsePostParams(s))) {
             d = {}
-        } 
+        }
         return c.postparams = d;
     }
     function getContext(e) {
@@ -33,15 +32,16 @@
     }
     /// json填充扩展
     (function () {
-    
+
+
         function setValue(root, pars) {
             var vl = pars.value,
                 o = pars.item,
                 path = pars.path,
                 propertyName = pars.propertyName,
-                e=pars.target,
+                e = pars.target,
                 opt = getContext(root).option;
-
+            if (!e) return;
             var p = "data-defaultValue";
             var cfn = opt && opt.columns && opt.columns[path];
             if (!$.isFunction(cfn)) {
@@ -53,6 +53,7 @@
                     }
                 })(cfn);
             }
+
             $.each(e, function (i, n) {
                 var tag = n.tagName
                     , pr = (n = $(n)).attr("data-property")
@@ -118,72 +119,69 @@
                 else if (!n.children().length) { n.text(v) }
             })
         }
-        
-        var fillPoliy = (function () { var fns = arguments; return function () { for (var i = 0, fn; fn = fns[i++];) { if (fn.apply(this, arguments) === true) { return true } } return false; } })
-            (
-            function (root, pars) { pars.target = findElements(root, pars.path, pars.propertyName); },
-            ///触发填充事件
-        function(root, pars) {
-            var c = getContext(root),
-                opt = c.option,
-                pn = pars.propertyName,
-                arg = { cancel: false, item: pars.item, propertyName: pn, path: pars.path, sender: root },
-                f;
-            if (opt && $.isFunction(f = opt.filling))
-            { f.call(root, pars.value, arg) }
 
-            if (opt && opt.tree === true && (pars.value instanceof Array) && pars.value.length && pn && (pn == opt.children || pn.toLowerCase() == "children")) {
-                arg = { cancel: false, target: pars.target, children: pars.value, item: pars.item };
-                if ($.isFunction(f = opt.creatingNodes)) {
-                    f.call(root, arg);
-                }
-                if (!arg.cancel) {
-                    var t = pars.target;
-                    if (t.parent().length) {
-                        var tg = t.parent()[0].tagName;
-                        t.addClass("has-children").next().clone().appendTo("<" + tg + "></" + tg + ">").parent().appendTo(t);
+        var fillPoliy = (function () { var fns = arguments; return function () { for (var i = 0, fn; fn = fns[i++];) { if (fn.apply(this, arguments) === true) { return true } } return false; } })
+            (function (root, pars) {
+                var c = getContext(root),
+                    opt = c.option,
+                    pn = pars.propertyName,
+                    arg = { cancel: false, item: pars.item, propertyName: pn, path: pars.path, sender: root },
+                    f;
+                if (opt && $.isFunction(f = opt.filling))
+                { f.call(root, pars.value, arg) }
+
+                if (opt && opt.tree === true && (pars.value instanceof Array) && pars.value.length && pn && (pn == opt.children || pn.toLowerCase() == "children")) {
+                    arg = { cancel: false, target: pars.target, children: pars.value, item: pars.item };
+                    if ($.isFunction(f = opt.creatingNodes)) {
+                        f.call(root, arg);
+                    }
+                    if (!arg.cancel) {
+                        var t = pars.target;
+                        if (t.parent().length) {
+                            var tg = t.parent()[0].tagName;
+                            t.addClass("has-children").next().clone().appendTo("<" + tg + "></" + tg + ">").parent().appendTo(t);
+                        }
                     }
                 }
-            }
-        },
+            },///触发填充事件
             function (root, pars) {
-              
-                if (d == null) {
-                   
+
+                if (pars.deep === 0 && pars.value == null) {
+                    return true;
                 }
             },///空数据
             function (root, pars) {
                 if (isBaseType(pars.value)) {
-                    pars.value = d;
+                    //pars.value = d;
                     setValue(root, pars);
                     return true;
                 }
             },///基本类型的数据
             function (root, pars) {
                 var d = pars.value;
-                ///填充对象数据
                 if ($.isPlainObject(d)) {
                     pars.item = d;
-                    var p = path || ''
+                    var p = pars.path || ''
                     if (p) { p = p + '.'; }
                     for (var i in d) {
                         if (!i) continue;
-                        fillPoliy(root, { deep: pars.deep + 1, value: d[i], propertyName: i, path: p+i });
+                        var path = p + i, propertyName = i;
+                        var target = findElements(pars.target || root, path, propertyName);
+                        fillPoliy(root, { deep: pars.deep + 1, value: d[i], target: target, propertyName: propertyName, path: path });
                     }
                     return true;
                 }
-            },
+            },///填充对象数据
             function (root, pars) {
                 var d = pars.value;
-                ///填充列表数据
                 if ($.isArray(d)) {
                     var ics = "fill-item",
                         tk = 'fill-template',
                         ck = 'fill-template-container',
                         ik = 'fill-template-intopoint',
-                        opt=getContext(root).option,
+                        opt = getContext(root).option,
                         e = pars.target || root,
-                        tmp,
+                        tmp, cs,
                         templateContainer, intopoint;
                     if ((tmp = e.data(tk)) || (tmp = e.children("." + (cs = "template"))).length || (tmp = e.find("." + cs)).length) {
                         if (!e.data(tk)) {
@@ -213,70 +211,51 @@
                         if (intopoint) { for (var i = 0; i < arr.length; i++) arr[i].insertBefore(intopoint) }
                         else { templateContainer.append(arr); }
                     }
-                    return
+                    return true;
                 }
-            }
+            }///填充列表数据
             );
         //装载数据
         function load(d, c) {
-
-            init(this, c);
-            d = trimData(d);
-            if (c.pagination) { c.pagination.hide() }
-            if (c.emptyData) { c.emptyData = root.find(".empty-data") }
-
+            var root = this,
+                opt = c.option,
+                emptyData = c.emptyData;
+            d = trimData(c, d);
             if (d.info) {
                 renderPagination(root, c, d.info);
                 d = d.rows;
             }
-
-            fillPoliy(root, { deep: 0, value: d });
-
+            fillPoliy(root, { deep: 0, value: d, path: '', propertyName: '' });
+            if (emptyData.length) {
+                emptyData.toggle(!(d && d.length > 0));
+            }
+            complete(root, opt, d);
+        }
+        function complete(root, opt, d, error) {
+            setCurrentSortElement(root);
             if (opt && $.isFunction(opt.complete)) {
-                opt.complete.call(root, d);
-                var empty = c.emptyData;
-                if (empty.length) {
-                    empty.toggle(!(d && d.length > 0));
-                }
+                opt.complete.call(root, { error: error, data: d, option: opt });
             }
         }
-        
+
         //初始化填充器
-        function init(root, c)
-        {
+        function init(root, c) {
             if (c.init === true) return;
             var opt = c.option;
             bindSortEvent(root, opt);
             bindPagingEvent(root, c);
+            if (c.pagination) { c.pagination.hide() }
+            var emptyData = c.emptyData;
+            if (!emptyData) { emptyData = c.emptyData = root.find(".empty-data") }
+            emptyData.hide();
             c.init = true;
         }
-        //获取分页器的设置选项
-        function getPagerOption(c) {
-            var opt = c.option;
-            opt = opt ? opt.pager : null;
-            if (opt)
-            {
-                if (!$.isPlainObject(opt)) { opt = {} }
-                if (opt.selector == null) {
-                    opt.selector = ".pagination";
-                }
-                if (opt.indexName == null) {
-                    opt.indexName = "pageindex";
-                }
-                if (opt.buttonDataPage == null) {
-                    opt.buttonDataPage = "data-page";
-                }
-                if (opt.offset == null) {
-                    opt.offset = 0;
-                }
-                if (opt.buttons==null) { opt.buttons = 10; }
-            }
-            return opt;
-        }
+
         //整理数据，相当于一个适配器
         function trimData(c, d) {
             var opt;
             if (!d || !(opt = getPagerOption(c))) return d;
+
             var fn = function (o, n, f) {
                 var some = function (a, cb) {
                     if (a.some) { return a.some(cb); }
@@ -290,23 +269,160 @@
                 }
                 return null;
             };
-            var o = (typeof (opt.prop) == "string" ? fn(d, opt.prop, true) : null) || fn(d, ["page", "pager", "paging", "pagination"]),rows;
+            var o = (typeof (opt.prop) == "string" ? fn(d, opt.prop, true) : null) || fn(d, ["page", "pager", "paging", "pagination"]), rows;
             if (o && (rows = (typeof (opt.rows) == "string" ? fn(d, opt.rows, true) : null) || fn(d, ["data", 'items', "rows", "list", "array", "collection"])) instanceof Array) {
                 return {
                     info: {
-                        total: fn(p, ["total", "records"]),
-                        index: (function () { var i = (fn(p, ["index", opt.indexName]) || c.pageIndex || 0) - opt.offset; if (i < 0) { i = 0; } return i })(),
-                        size: fn(p, ["size", "pagesize"]) || c.pageSize || 10,
-                        count: fn(p, ["count", "pagecount"])
+                        total: fn(o, ["total", "records"]),
+                        index: (function () { var i = fn(o, ["index", opt.indexName]); if (i == null || isNaN(i)) { i = c.pageIndex || 0 }; i = i - opt.offset; if (i < 0) { i = 0; } return i })(),
+                        size: fn(o, ["size", opt.sizeName]) || c.pageSize || 10,
+                        count: fn(o, ["count", "pagecount"])
                     },
                     rows: rows
                 };
             }
             return d;
         }
+
+
+        //获取数据
+        function getData(url, data, context) {
+            var root = this,
+                opt = context.option || {},
+                loading = opt.loading,
+                filter = function (d) { return d },
+                err;
+            if ($.isFunction(opt.filter)) { filter = opt.filter; }
+            if (context.req) { context.req.abort(); }
+            setSortExpression(root, data);
+            setPageSize(root, data);
+            context.req = req({
+                url: url,
+                type: opt.type || "POST",
+                dataType: "json",
+                data: $.toNameValues(data),
+                error: function (xhr, ts, et) { err = { xhr: xhr, textStatus: ts, errorThrown: et, message: req.responseText } },
+                success: function (d) {
+                    context.url = url;
+                    load.call(root, filter.call(root, d, context, data), context);
+                },
+                complete: function () {
+                    context.req = null;
+                    if (loading && loading.length) { loading.hide() }
+                    if (err) {
+                        complete(root, opt, null, err);
+                    }
+                },
+                beforeSend: function () {
+                    if (!(loading instanceof jQuery)) {
+                        var sltr = loading;
+                        if (typeof (sltr) !== 'string' || ((loading = root.find(sltr)).length === 0 && ((loading = $(sltr)).length === 0))) {
+                            loading = root.find(".loading");
+                        }
+                    }
+                    loading.show();
+                }
+            });
+        }
+        //从排序元素中获取排序表达式
+        function getSortExpression(e, sw) {
+            var n = 'sortExpression', d = 'desc', a = " " + d, b = "";
+            if (sw === true) {
+                var tmp = a;
+                a = b;
+                b = tmp
+            }
+            return (e.data(n) || e.attr('data-' + n) || e.attr(n)) + (e.hasClass(d) ? a : b);
+        }
+        //设置当前元素
+        function setCurrentSortElement(root) {
+            var c = getContext(root);
+            if (c.sortThead) {
+                var th = c.sortThead, n = c.sortName, v = c.sortExpression, e = c.currentSortElement;
+                if (v == null) return;
+                var arr = v.split(' '), p = $.trim(arr[0]), desc = 'desc';
+                if (!e) {
+                    e = th.find('.sort[data-sortExpression="' + p + '"]');
+                    if (!e.length && !(e = th.find('.sort[sortExpression="' + p + '"]')).length) { return; }
+                    //if ($.trim(arr[1]) === desc) { e.addClass(desc) } else { e.removeClass(desc) }
+                }
+                var active = 'active'
+                if (!e.hasClass(active)) {
+                    th.find(".sort." + active).removeClass(active);
+                    e.addClass(active)
+                }
+                if (c.switchSortDirection) {
+                    e.toggleClass('desc', $.trim(arr[1]) === desc);
+                    delete c.switchSortDirection;
+                }
+            }
+        }
+        //设置排序表达式参数值
+        function setSortExpression(root, p) {
+            if (!$.isPlainObject(p)) return;
+            var c = getContext(root);
+            if (!c.sortThead || !c.sortName) return;
+            var th = c.sortThead, n = c.sortName, v = c.sortExpression;
+            if (p[n]) return;
+            if (v == null) {
+                var e = th.find('.sort.active');
+                if (e.length) {
+                    c.sortExpression = v = getSortExpression(e);
+                    c.currentSortElement = e;
+                }
+            }
+            if (v != null) p[n] = v;
+        }
+        ///绑定排序事件
+        function bindSortEvent(root, opt) {
+            var context = getContext(root), sort = opt && opt.sort, thead, sortItemSltr = ".sort";
+            if (sort && (thead = root.find(typeof (sort) == "string" ? sort : (sort.thead ? sort.thead : ".thead"))).length) {
+                context.sortThead = thead;
+                context.sortName = sort.name || "sortExpression";
+
+                var sortHandler = function () {
+                    var s = $(this),
+                        currentCss = "active",
+                        desc = "desc",
+                        handler = $.isFunction(sort) ? sort : ($.isPlainObject(sort) && $.isFunction(sort.handler) ? sort.handler : null);
+                    var switchSort = s.hasClass(currentCss), sortValue = getSortExpression(s, switchSort),
+                    arg = { data: context.postparams, sortExpression: sortValue, option: opt, cancel: false };
+                    if (handler) { handler.call(this, arg); }
+                    if (!arg.cancel) {
+                        var url = context.url;
+                        if (typeof (url) != "string") { url = root.attr("data-src") }
+                        if (!arg.data) { arg.data = {} }
+                        context.sortExpression = arg.data[context.sortName] = sortValue;
+                        context.currentSortElement = s;
+                        context.switchSortDirection = switchSort;
+                        root.fill(url, arg.data, arg.option);
+                    }
+                };
+
+                if (thead.live) { $(sortItemSltr, thead).live("click", sortHandler) } else { thead.on("click", sortItemSltr, sortHandler); }
+            }
+        }
+
+        //设置分页的最大尺寸
+        function setPageSize(root, p) {
+            if (!$.isPlainObject(p)) return;
+            var c = getContext(root);
+            if (!c.pagination) return;
+            var opt = getPagerOption(c),
+                size = p[opt.sizeName];
+
+            if (size != null) {
+                c.pageSize = size;
+                return;
+            }
+            if ((size = c.pageSize) != null) {
+                p[opt.sizeName] = size;
+            }
+        }
         ///分页器
         function renderPagination(root, c, info) {
             var el = c.pagination;
+
             if (!info || !el) return;
             var opt = getPagerOption(c);
 
@@ -317,11 +433,13 @@
                 index = info.index,
                 next = index + 1,
                 prev = index - 1,
-                count = info.count;
-
+                count = info.count,
+                total = info.total;
+            c.pageSize = info.size;
             if (total > 0 && (isNaN(count) || count <= 0)) {
                 count = Math.floor(total / info.size) + (total % info.size > 0 ? 1 : 0);
             }
+
             el.fill(info);
             if (count > 1) {
                 el.show();
@@ -348,21 +466,24 @@
                 }
                 if (number.length) {
                     if (!btns || isNaN(btns) || btns <= 0) { btns = 10 }
-                    var end = index + Math.floor(btns / 2), start,  active = opt.active || 'active';
+
+                    var end = index + Math.floor(btns / 2), start, active = opt.active || 'active';
                     if (end >= count) { end = count - 1; }
                     start = end + 1 - btns;
+
                     if (start < 0) {
-                        end += 0 - end;
+                        end += (0 - start);
                         if (end >= count) { end = count - 1; }
                         start = 0;
                     }
+
                     container.children('[role="page-number"]').remove();
                     for (var i = start; i <= end; i++) {
                         var clone = number.clone(), link = clone.find('a');
                         if (!link.length) { link = clone; }
                         link.text(i + 1);
-                        if (index == i) {clone.addClass(active) }
-                        else { link.attr(dpn, i + offset)}
+                        if (index == i) { clone.addClass(active) }
+                        else { link.attr(dpn, i + offset) }
                         if (intopoint) { clone.insertBefore(intopoint) } else { container.append(clone) }
                     }
 
@@ -370,81 +491,38 @@
             }
             else { el.hide() }
         }
-   
-        //获取数据
-        function getData(url, data, opt, cfn) {
-            var root = this, context = getContext(root), filter = function (d) { return d; },
-                fn = function () {
-                    opt = opt || pars(root.attr("data-options"));
-                    if ($.isFunction(opt)) {
-                        opt = $.isFunction(cfn) ? { complete: cfn, filling: opt } : { complete: opt };
-                    }
-                    else if (typeof (opt) == "boolean") { opt = { pager: opt, complete: cfn } }
-                    context.option = opt;
-                };
-            if (typeof (url) != "string") {
-                if (url) {
-                    opt = data;
-                    data = null
+        //获取分页器的设置选项
+        function getPagerOption(c) {
+            var opt = c.option;
+            opt = opt ? opt.pager : null;
+            if (opt) {
+                if (!$.isPlainObject(opt)) { opt = {} }
+                if (opt.selector == null) {
+                    opt.selector = ".pagination";
                 }
-                fn();
-                load.call(this, url, context);
+                if (opt.indexName == null) {
+                    opt.indexName = "pageindex";
+                }
+                if (opt.sizeName == null) {
+                    opt.sizeName = "pagesize";
+                }
+                if (opt.buttonDataPage == null) {
+                    opt.buttonDataPage = "data-page";
+                }
+                if (opt.offset == null) {
+                    opt.offset = 0;
+                }
+                if (opt.buttons == null) { opt.buttons = 10; }
             }
-            else {
-                var tmp, loading = opt ? opt.loading : null;
-                if ((tmp = typeof (data)) == 'function' || tmp == "boolean") { cfn = opt; opt = data; data = null; }
-                if (opt && $.isFunction(opt.filter)) { filter = opt.filter; }
-                req({
-                    url: url
-                    , type: "POST"
-                    , dataType: "json"
-                    , data: $.toNameValues(data = getPostParams(root, data))
-                    , success: function (d) {
-                        fn();
-                        load.call(root, filter.call(root, d, context, data))
-                    }
-                    , complete: function () { if (loading.length) { loading.hide(); } }
-                    , beforeSend: function () { loading = (loading ? $(loading) : root.find(".loading")).show(); }
-                })
-            }
-        }
-        ///绑定排序事件
-        function bindSortEvent(root, opt) {
-            var sort = opt && opt.sort, thead, sortItemSltr = ".sort";
-            if (sort && (thead = root.find(typeof (sort) == "string" ? sort : (sort.thead ? sort.thead : ".thead"))).length) {
-                var sortHandler = function () {
-                    var s = $(this),
-                        sortExp = s.attr("sortExpression") || s.attr("data-sortExpression"),
-                        currentCss = "active",
-                        desc = "desc",
-                        handler = $.isFunction(sort) ? sort : ($.isPlainObject(sort) && $.isFunction(sort.handler) ? sort.handler : null),
-                        sortName = sort.name || "sortExpression",
-                        sortValue,
-                        arg;
-                    if (!s.hasClass(currentCss)) { thead.find(sortItemSltr + "." + currentCss).removeClass(currentCss); s.addClass(currentCss) }
-                    else { s.toggleClass(desc) }
-                    sortValue = sortExp + (s.hasClass(desc) ? " desc" : "");
-                    arg = { data: getContext(root).postparams, sortExpression: sortValue, option: opt, cancel: false };
-                    if (handler) { handler.call(this, arg); }
-                    if (!arg.cancel) {
-                        if (!arg.data) { arg.data = {} }
-                        arg.data[sortName] = sortValue;
-                        if (typeof (url) != "string") { url = root.attr("data-src") }
-                        root.fill(url, arg.data, arg.option);
-                    }
-                };
-                if (thead.live) { $(sortItemSltr, thead).live("click", sortHandler) } else { thead.on("click", sortItemSltr, sortHandler); }
-            }
+            return opt;
         }
         ///绑定分页事件
-        function bindPagingEvent(root, c)
-        {
+        function bindPagingEvent(root, c) {
             var opt = getPagerOption(c);
             if (!opt) { return }
-            var el = (p.selector instanceof jQuery) ? p.selector : root.find(p.selector);
-            if (!e.length) { el = $(p.selector) };
-            if (el.length)
-            {
+            var el = (opt.selector instanceof jQuery) ? opt.selector : root.find(opt.selector);
+            if (!el.length) { el = $(opt.selector) };
+            if (el.length) {
                 var bdp = opt.buttonDataPage,
                     ev = function () {
                         var s = $(this),
@@ -468,11 +546,12 @@
             }
 
 
-           
-          
+
+
         }
         ///查找填充字段的元素
         function findElements(el, path, name) {
+            if (!el) return null;
             var fn = function (n) {
                 if (!n) return $();
                 var e;
@@ -488,78 +567,41 @@
                 }
                 return e
             }
-            var el = fn(path);
-            if (!el || el.length == 0) { el = (el = fn(name ? name : (arr = path.split("."))[arr.length - 1])).length ? el : null }
-            return el;
+            var target = fn(path), arr;
+            if (!target || target.length == 0) { target = (target = fn(name ? name : (arr = path.split("."))[arr.length - 1])).length ? target : null }
+            return target;
         }
-      
-
-
 
         $.prototype.fill = function (url, data, opt, cfn) {
-            var tmp
-          
-            , fn = function (x, path, obj, propertyName, index) {
-
-                var self = this, f, cs
-               
-                    
-                if (!e || e.length == 0) { e = (e = find(propertyName ? propertyName : (arr = path.split("."))[arr.length - 1])).length ? e : self }
-
-                arg.target = e;
-                callFilling(opt, arg, x);
-                if (arg.cancel) { return }
-
-                ///基础数据类型
-                if (isBaseType(x)) {
-                    if (root != e && e.length) {
-                        setValue(e, x, obj, path, opt, propertyName);
+            var root = $(this),
+                context = getContext(root),
+                fn = function () {
+                    opt = opt || pars(root.attr("data-options"));
+                    if ($.isFunction(opt)) {
+                        opt = $.isFunction(cfn) ? { complete: cfn, filling: opt } : { complete: opt };
                     }
-                    return
+                    else if (typeof (opt) == "boolean") { opt = { pager: opt, complete: cfn } }
+                    context.option = opt;
+                    init(root, context);
+
+                };
+
+            if (typeof (url) != "string") {
+                if (url) {
+                    opt = data;
+                    data = url;
+                    url = null;
                 }
-                ///填充列表数据
-                if (x instanceof Array) {
-                    var v, ics = "fill-item", templateContainer, intopoint;
-                    if ((f = e.data('fill-template')) || (f = e.children("." + (cs = "template"))).length || (f = e.find("." + cs)).length) {
-                        if (!e.data('fill-template')) {
-                            e.data('fill-template-container', templateContainer = f.parent());
-                            e.data('fill-template', f);
-                            if (f.next().length) { e.data('fill-template-intopoint', intopoint = f.next()); }
-                            f.remove().removeClass(cs).addClass(ics);
-                        } else { templateContainer = e.data('fill-template-container'); intopoint = e.data('fill-template-intopoint'); }
-                        ///如果不是追加，那么移除已填充的项
-                        if (!(opt && opt.append)) { templateContainer.children('.' + ics).remove(); }
-                        var els = [];
-                        $.each(x, function (i, n) {
-                            if (n) {
-                                var el = f.clone();
-                                if (opt && $.isFunction(opt.creating)) {
-                                    var craArg = { cancel: false, item: n, index: i, path: path };
-                                    opt.creating.call(e, craArg, el);
-                                    if (craArg.cancel) return;
-                                }
-                                fn.call(el, n, path, x, '[]', i);
-                                els.push(el);
-                            }
-                        });
-                        if (intopoint) { for (var i = 0; i < els.length; i++) els[i].insertBefore(intopoint) }
-                        else { templateContainer.append(els); }
-                    }
-                    return
-                }
-                ///填充对象数据
-                if (x instanceof Object) {
-                    for (var i in x) {
-                        if (!i) continue;
-                        var item = x[i];
-                        fn.call(e, item, path + (path ? "." : "") + i, x, i, index)
-                    }
-                    return
-                }
+                fn();
+                load.call(this, data, context);
             }
-           
-             
-            getData.apply($(this), arguments);
+            else {
+                var tmp, loading = opt ? opt.loading : null;
+                if ((tmp = typeof (data)) == 'function' || tmp == "boolean") { cfn = opt; opt = data; data = null; }
+                data = getPostParams(root, data)
+                fn();
+                getData.call(root, url, data, context);
+            }
             return this
         }
 
@@ -713,8 +755,7 @@
                         }
                     })(s.success)
                 }
-                $.ajax(url, s);
-                return;
+                return $.ajax(url, s)
             }
             if (!isFD)
             { s.data = $.toNameValues(s.data, true); }
@@ -728,8 +769,20 @@
                 }
                 return f.apply(self, p);
             }, r;
+            var result = {
+                status: xhr.status,
+                readyState: xhr.readyState,
+                statusText: xhr.statusText,
+                abort: function () { xhr.abort(); return this },
+                getAllResponseHeaders: function () { return xhr.getAllResponseHeaders() },
+                getResponseHeader: function (a) { return xhr.getResponseHeader(a) }
+            };
             xhr.addEventListener("error", function (e) { ex(s.error, xhr, e) }, false);
             xhr.addEventListener("readystatechange", function () {
+                result.status = xhr.status;
+                result.statusText = xhr.statusText;
+                result.readyState = xhr.readyState;
+                result.responseText = xhr.responseText;
                 if (xhr.readyState == 4) {
                     r = xhr.responseText;
                     if (s.dataFilter) { r = ex(s.dataFilter, r, s.dataType) }
@@ -750,7 +803,7 @@
             xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             ex(s.beforeSend, xhr);
             xhr.send(s.data)
-
+            return result;
         }
     });
 
@@ -772,13 +825,16 @@
         ///动作触发器
         (function () {
             var sltr = "[data-toggle='action'][data-target]", fn = function () {
-                var e = $(this), s = $(e.attr('data-target')), a = "action", d_a = 'data-' + a, u = e.attr(d_a) || s.attr(d_a) || s.attr(a) || location.href,
+                var e = $(this), loadingCss = 'loading';
+                if (e.hasClass(loadingCss)) return;
+                var s = $(e.attr('data-target')), a = "action", d_a = 'data-' + a, u = e.attr(d_a) || s.attr(d_a) || s.attr(a) || location.href,
                     valid = pars(e.attr('data-valid') || s.attr('data-valid')), ms;
                 if (!s.length) return;
                 if (!(ms = $.isPlainObject(valid) ? s.modelState(valid) : s.modelState()).errors) {
                     var m = ms.model, params = parsePostParams(e), reset, result = null, err = null, prog_pnl = null, prog = e.data('progress') || pars(prog_pnl = e.attr('data-progress'));
                     if (params && $.isPlainObject(params)) { for (var i in m) { params[i] = m[i] } }
                     else { params = m }
+                    e.addClass(loadingCss);
                     if ($.isFunction(e.button)) { e.button('loading'); reset = true }
                     if (!$.isFunction(prog) && prog_pnl && (prog_pnl = $(prog_pnl)).length) {
                         var progFn, prog_bar;
@@ -805,6 +861,7 @@
                         success: function (json) { result = json; },
                         error: function (req, ts, et) { err = { req: req, textStatus: ts, errorThrown: et } },
                         complete: function () {
+                            e.removeClass(loadingCss);
                             if (reset === true) { e.button('reset') }
                             var dcbn = 'callback', b = e.data(dcbn) //|| pars(e.attr('data-' + dcbn))
                                 , arg = { cancel: false, error: err, context: s, posted: params };
