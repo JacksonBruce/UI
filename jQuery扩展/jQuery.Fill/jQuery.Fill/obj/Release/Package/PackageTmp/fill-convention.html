@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+</head>
+<body>
+    <h1>数据填充约定示例</h1>
+    <div id="info">
+        <h2 data-fill="title"></h2>
+        <div>
+            <label>first name</label>
+            <input type="text" name="firstName" />
+        </div>
+        <div>
+            <label>last name</label>
+            <input type="text" name="lastName" />
+        </div>
+        <div>
+            <label>Sex</label>
+            <input type="radio" name="sex" value="female"> Female
+            <input type="radio" name="sex" value="male"> Male
+        </div>
+        <div>
+            <img data-fill="portrait" />
+        </div>
+        <div>
+            <h5>introduce</h5>
+            <p data-fill="introduce" data-property=":html"></p>
+        </div>
+        <a data-fill="url" target="_blank" data-property="href">这里是链接</a>
+    </div>
+
+
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.fill.1.0.js" async></script>
+
+    <script>
+        $(window).load(function () {
+            $("#info").fill({
+                title: "my info", firstName: "Jackson", lastName: "Bruce", sex: "male"
+                , introduce: "I was learn in <i>10/03/1998</i>"
+                ///图片
+                , portrait: "https://ss0.baidu.com/7Po3dSag_xI4khGko9WTAnF6hhy/super/whfpf%3D425%2C260%2C50/sign=54a82a81f236afc30e596c25d524dff6/810a19d8bc3eb135641dd0faa31ea8d3fc1f449c.jpg"
+                //链接
+                , url: "http://baidu.com?w=xxx"
+            });
+        })
+
+    </script>
+
+    
+</body>
+</html>

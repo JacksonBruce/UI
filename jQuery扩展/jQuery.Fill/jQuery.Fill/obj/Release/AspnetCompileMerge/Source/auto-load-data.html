@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+
+    <title>自动加载数据 jQuery fill方法测试 </title>
+    <style>.template{display:none;}</style>
+</head>
+<body>
+    <div>
+        <!--<h2>数据1</h2>
+        <ul class="data0" data-src="/home/getdata" data-delegate="load">
+            <li class="template">
+                <label data-fill="name"></label>:<span data-fill="title"></span>
+                <span data-fill="date" data-dateformat="{yyyy}年{MM}月{dd}日 星期{w:日,一,二,三,四,五,六},{hh}时{mm}分{ss}秒"></span>
+                <div data-fill="books">
+                    <h3>书籍</h3>
+                    <div class="template" style="margin-bottom:1em;">
+                        <label data-fill="name"></label>
+                        作者：<span data-fill="author"></span>
+                    </div>
+                </div>
+            </li>
+        </ul>-->
+        <h2>数据2</h2>
+        <ul class="data1" data-toggle="load" data-src="/home/getdata">
+            <li class="fill-item">
+                <label data-fill="name">bruce</label>:<span data-fill="title">hass</span>
+                <span data-dateformat="{yyyy}年{MM}月{dd}日 星期{w:日,一,二,三,四,五,六},{hh}时{mm}分{ss}秒" data-fill="date">2014年12月26日 星期五,8时8分56秒</span>
+                <div data-fill="books">
+                    <h3>书籍</h3>
+                    <div style="margin-bottom:1em;" class="fill-item">
+                        <label data-fill="name">mvc 4.0</label>
+                        作者：<span data-fill="author">feng</span>
+                    </div><div style="margin-bottom:1em;" class="fill-item">
+                        <label data-fill="name">jQuery 10</label>
+                        作者：<span data-fill="author">Jonh</span>
+                    </div><div style="margin-bottom:1em;" class="template">
+                        <label data-fill="name">bruce</label>
+                        <!--作者：<span data-fill="author"></span>-->
+                    </div>
+                </div>
+            </li>
+
+            <li class="template">
+                <label data-fill="name"></label>:<span data-fill="title"></span>
+                <span data-fill="date"></span>
+                <div data-fill="books">
+                    <h3>书籍</h3>
+                    <div class="template" style="margin-bottom:1em;">
+                        <label data-fill="name"></label>
+                        作者：<span data-fill="author"></span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <a href="javascript:" id="submit1" data-toggle="fill" data-target=".data1" data-postparams="{id:22}" onclick="$('<span>|</span><a href=\'javascript:\' data-toggle=\'fill\' data-target=\'.data1\'>dddd</a>').insertAfter(this)">submit1</a>
+        <a href="javascript:" id="submit2" data-toggle="fill" data-target=".data1" data-postparams="{id:23}" data-options="{append:true,complete:function(d){alert('追加的。。')}}">submit2</a>
+    </div>
+
+    <div id="info"></div>
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.validate.js"></script>
+    <!--<script src="Scripts/jquery.fill.1.0-min.js"></script>-->
+    <script src="Scripts/jquery.fill.1.0.js"></script>
+    
+</body>
+</html>

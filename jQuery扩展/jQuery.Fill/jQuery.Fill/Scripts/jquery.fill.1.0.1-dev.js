@@ -33,7 +33,6 @@
     /// json填充扩展
     (function () {
 
-
         function setValue(root, pars) {
             var vl = pars.value,
                 o = pars.item,
@@ -755,8 +754,10 @@
                         }
                     })(s.success)
                 }
+
                 return $.ajax(url, s)
             }
+
             if (!isFD)
             { s.data = $.toNameValues(s.data, true); }
             var xhr = new XMLHttpRequest(), self = this, ex = function (f) {
@@ -784,6 +785,7 @@
                 result.readyState = xhr.readyState;
                 result.responseText = xhr.responseText;
                 if (xhr.readyState == 4) {
+
                     r = xhr.responseText;
                     if (s.dataFilter) { r = ex(s.dataFilter, r, s.dataType) }
                     else { try { r = $.parseJSON(r) } catch (x) { } }

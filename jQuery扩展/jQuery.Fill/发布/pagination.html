@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>填充列表：分页和排序的测试</title>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .loading {
+            position:fixed;top:50%;left:50%;text-align:center;line-height:2em;margin-top:-1em;z-index:99999;display:none;font-size:25px;background-color:#0094ff;color:white;margin-left:-5em;padding:0 .25em;
+        }
+        .sort {position:relative;cursor:pointer;}
+        .sort>.glyphicon,.sort.active.desc > .glyphicon-arrow-up  {display:none;}
+        .sort.active > .glyphicon-arrow-up,.sort.active.desc > .glyphicon-arrow-down{display:inline-block;}        
+    </style>
+</head>
+<body>
+    
+    <table class="table" data-src="/Pagination/index" data-toggle="load" data-postparams="{pageSize:20}" data-options="{pager:true,loading:'.loading',sort:true}">
+        <thead>
+            <tr class="thead">
+                <th>#</th>
+                <th class="sort active" data-sortexpression="Name">
+                    书名
+                    <span class="glyphicon glyphicon-arrow-down"></span><span class="glyphicon glyphicon-arrow-up"></span>
+                </th>
+                <th class="sort" data-sortexpression="Name">作者
+                    <span class="glyphicon glyphicon-arrow-down"></span><span class="glyphicon glyphicon-arrow-up"></span></th>
+                <th class="sort" data-sortexpression="Publisher">出版社
+                    <span class="glyphicon glyphicon-arrow-down"></span><span class="glyphicon glyphicon-arrow-up"></span></th>
+                <th>时间</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="template" style="display:none;">
+                <td>
+                    <label>
+                        <input type="checkbox" data-fill="ID" />
+                        <text data-fill="Number"></text>
+                    </label>
+                </td>
+                <td data-fill="Name">书名</td>
+                <td data-fill="Author">作者</td>
+                <td data-fill="Publisher">出版社</td>
+                <td data-fill="DateTime" data-dateformat="{yyyy}-{MM}-{dd} 星期{w:日,一,二,三,四,五,六}，{hh}:{mm}:{ss}">时间</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align:center;">
+                    <ul class="pagination" style="display:none;">
+                        <li class="first">
+                            <a href="javascript:">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="number"><a href="javascript:"></a></li>
+                        <li class="last">
+                            <a href="javascript:">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <div class="loading">
+        loading...
+    </div>
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.fill.1.0-dev.js"></script>
+</body>
+</html>

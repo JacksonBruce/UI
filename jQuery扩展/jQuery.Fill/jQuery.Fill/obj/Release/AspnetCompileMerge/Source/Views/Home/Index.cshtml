@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>jQuery.fill  @Model</h1>
+    <p class="lead">
+        jQuery.fill是一组填充数据的jQuery扩展方法，它试图将html、css与数据分离，减少大量的html拼接代码，提高web前端的工作效率，主要功能有：fill向匹配DOM对象填充来自服务器数据或者json对象；modelState将匹配的DOM对象反序列化为json对象，它可以和表单、jQuery.validtion协同工作，toNameValues是一个很有趣jQuery静态方法，它将复杂的js对象，数组等转换成一组键/值对提交给服务端，它和asp.net mvc的默认模型绑定器协同工作。
+ </p>
+</div>
+
+<div class="row">
+<h2>约定</h2>
+<p>
+    数据填充使用了属性约定和ID约定，分页、排序和模板使用了css类选择器约定
+</p>
+<h3>数据填充约定</h3>
+<p>
+    向一个jQuery对象填充数据时，查找带有data-fill | data-field | name属性的DOM对象并将json对象与之匹配的属性值向其填充，如果同时出现这个三个属性那么就按照前面的顺序进行优先填充，填充的默认规则由其标签类型决定，默认填充规则如下：<br />
+    1、input:checbox,input:radio （复选框和单选框） 如果元素的value是空的或者未设置value，那么值填充给value，如果value与填充的值相等，那么将checked属性设为true，否则false；<br/>
+    2、input,textarea,select 这种类型的元素直接将值填充给它的value属性；<br />
+    3、img 默认填充值给它的src属性；<br />
+    4、其他的标签默认填充text属性；<br />
+    5、text标签和data-replace属性，（text不是一个有效的html标签）当遇到text标签，或者标签包含有data-replace属性时，它将被填充的值替换掉；<br />
+    也可以通过data-property属性指定个填充属性来改变以上的默认规则，例如：&lt;a data-fill="url" data-property="href"&gt;点击这里&lt;/a&gt;； data-property属性的":text"和":html"有特殊的意义，:text表示填充文本内容也是大多数非表单标签（img除外）的默认填充规则，而:html则是用来指定填充元素的innerHTML属性，在填充富文本时很有用。
+    <br /><a href="/fill-convention.html">通过这个例子演示一下数据填充约定</a>
+</p>
+<h3>CSS类选择器约定</h3>
+<p>
+    当填充一个列表或者树形结构的数据时，需要在填充的容器中定义模板，用“template”CSS类选择器指定当前块是模板；<br />
+    列表的分页选择器约定：分页模板用：pager、第一页：first、最后页：last、下一页：next、上一页：prev、数字：number，其他信息遵循数据填充约定，分页按钮包含有data-page属性指定页面数；<br />
+    列表的排序需要指定一个表头，表头的默认类选择器是“thead”，可排序列由“sort”指定，包含“active”类选择器的表示当前排序列，默认是升序，“desc”类选择器指定降序，每个可排序列需要通过sortExpression（或者data-sortExpression）属性指定排序的字段，暂时不支持多字段排序规则。
+</p>
+<h3>触发器约定</h3>
+<p>
+    触发器是当用户触发click事件时才填充页面上的元素，或者提交表单，使用触发器减少大量重复的代码。<br />
+    data-toggle属性指定触发器的类型，是必须的，可选值有：fill | action | load,其实只有两种类型：填充和动作，load是填充的扩展形式，指定只在页面装载时自动填充元素，它必须和data-src属性一起使用，data-src指定数据来源的路径；<br />
+    data-target属性指定事件触发后填充的目标或者要提交的表单（非表单元素也可以）
+</p>
+<h3>方法</h3>
+<p>了解了前面的一些约定，再来看方法的使用和案例就容易理解多了</p>
+<h4>fill</h4> 
+<p>描述：向jQuery对象填充json对象，json对象可以是客户端的js对象或者，</p>
+</div>

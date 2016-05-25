@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+
+    <title>jQuery fill方法测试 </title>
+    <style>
+    /*.template {display:none;}*/
+    /*组合框的样式*/
+    .combobox {position:relative;display:inline-block;}
+    .combobox > ul.droplist {position:absolute;top:100%;left:0;right:0;z-index:9999999;min-height:100px;max-height:200px;overflow:auto;background-color:#fff;border:solid 1px #999;display:none; }
+    .combobox > ul.droplist > li {line-height:1.8em;padding:0 .75em;cursor:pointer}
+    .combobox > ul.droplist > li:hover {background-color:#333;color:#fff;}
+    .combobox > ul.droplist > li.empty-data:hover, .combobox > ul.droplist > li.empty-data {background-color:inherit;color:#ccc;cursor:inherit;}
+    </style>
+</head>
+
+<body style="background:#f5f5f5">
+    <a href="javascript:" id="btnSubmit">提交数据</a>
+    <h2>填充表单</h2>
+    <div class="data2">
+        <form>
+            <div>
+                <label><input name="Gender" type="radio" value="true" />男 </label>
+                <label><input name="Gender" type="radio" value="false" />女 </label>
+            </div>
+            <div>
+                <label>name：</label><input name="name"/>
+            </div>
+            <div>
+                <label>title：</label><input name="title" />
+            </div>
+            <div>
+                <label>date：</label><input name="date" />
+            </div>
+            <h3>书籍</h3>
+            <div data-fill="book">
+                <div>
+                    <label>name：</label><input name="book.name" />
+                </div>
+                <div>
+                    <label>author：</label><input name="book.author" />
+                </div>
+                <input name="book.ID" type="hidden" />
+            </div>
+            <div >
+                <label>image：</label>
+                <input type="file" name="images" multiple accept="" />
+            </div>
+            <div>
+
+                <label><input name="ListID" type="checkbox" value="85" />85 </label>
+                <label><input name="ListID" type="checkbox" value="2" />2 </label>
+                <label><input name="ListID" type="checkbox" value="98" />98 </label>
+                <label><input name="ListID" type="checkbox" value="75" />75 </label>
+                <label><input name="ListID" type="checkbox" value="158" />158 </label>
+                <label><input name="ListID" type="checkbox" value="78" />78 </label>
+            </div>
+            <input name="ID" type="hidden" />
+            <progress id="progress" style="width:200px;" value="0" max="1"></progress>
+            <div>
+                <a href="javascript:" id="submit">submit</a>
+            </div>
+        </form>
+    </div>
+    <div data-load-src="/">
+        <h2>数据1</h2>
+        <ul class="data0">
+            <li class="template">
+                <label data-fill="name"></label>:<span data-fill="title"></span>
+                <span data-fill="date" data-dateformat="{yyyy}年{MM}月{dd}日 星期{w:日,一,二,三,四,五,六},{hh}时{mm}分{ss}秒"></span>
+                <div data-fill="books">
+                    <h3>书籍</h3>
+            <div class="template" style="margin-bottom:1em;">
+                <label data-fill="name"></label>
+                作者：<span data-fill="author"></span>
+            </div>
+</div>
+            </li>
+        </ul>
+        <h2>数据2</h2>
+        <ul class="data1">
+            <li class="fill-item">
+                <label data-fill="name">bruce</label>:<span data-fill="title">hass</span>
+                <span data-dateformat="{yyyy}年{MM}月{dd}日 星期{w:日,一,二,三,四,五,六},{hh}时{mm}分{ss}秒" data-fill="date">2014年12月26日 星期五,8时8分56秒</span>
+                <div data-fill="books">
+                    <h3>书籍</h3>
+                    <div style="margin-bottom:1em;" class="fill-item">
+                        <label data-fill="name">mvc 4.0</label>
+                        作者：<span data-fill="author">feng</span>
+                    </div><div style="margin-bottom:1em;" class="fill-item">
+                        <label data-fill="name">jQuery 10</label>
+                        作者：<span data-fill="author">Jonh</span>
+                    </div><div style="margin-bottom:1em;" class="template">
+                        <label data-fill="name">bruce</label>
+                        作者：<span data-fill="author"></span>
+                    </div>
+                </div>
+            </li>
+
+            <li class="template">
+                <label data-fill="name"></label>:<span data-fill="title"></span>
+                <span data-fill="date"></span>
+                <div>
+                    <h3>书籍</h3>
+                    <div class="template" style="margin-bottom:1em;">
+                        <label data-fill="books.name"></label>
+                        作者：<span data-fill="books.author"></span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+ 
+    <h2>填充字符串</h2>
+    <div class="data3"></div>
+    <h2>填充html字符串,或字段填充到的属性</h2>
+    <div class="data4">
+       
+        <div data-fill="content" data-property=":html"></div>
+        <div data-fill="title" data-property="title">
+            鼠标移在上面显示填充的数据
+        </div>
+        <a href="javascript:" id="btn">代理事件</a>
+    </div>
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.validate.js"></script>
+    <!--<script src="Scripts/jquery.fill.1.0-min.js"></script>-->  
+      <script src="Scripts/jquery.fill.1.0.js"></script>
+
+    <script>
+
+        ///.zhbosCookies
+        ///16068F0EDD58C5B9D286B5E84A036A24B059EEAD20AB1B4AB11291B5BD63F2040F6113DA00AA073BF8D8917A1A14E86083FD379B5957590E671D91AFB556F3750604E06C9903A5F460C47919E1429D8FCE23429363DB9047FC816023F21E3F35985F8DAE0B62E7D5DFA866A37FCE2541559078202210791067989261B82C2E635450467BBA75CA93AE2D8BD5DC36883D3F525F77
+        $("#submit").click(function () {
+            var d = $('.data2').modelState().model;
+            $.ajax("/home/post", {
+                data: $.toNameValues(d), progress: function (e, xhr) {
+                    $("#progress").attr({ value: e.loaded, max: e.total });
+                }
+            });
+            ///alert(d.model.images);
+
+            //var xhr = new XMLHttpRequest();
+           
+            //xhr.onreadystatechange = function () {
+            //    if (xhr.readyState == 4) {
+            //        alert(xhr.responseType)
+            //        //alert(xhr.responseText);
+            //    }
+            //}
+            //xhr.open("post", "/home/post", true);
+            //xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            //xhr.send(fd)
+
+
+
+        });
+        //填充来自服务端的数据*····
+        $(".data0").fill("/home/getdata", {ids:[32,23]},true);
+        $(".data2 form").validate({ rules: { name: { minlength: 5, required: true } } });
+
+        ////填充来自数组模型
+        //var data = { page: {total:223,size:12,index:2}, data: [{ "name": "kkkkkkkkk", "title": "hhhh", "date": "\/Date(1419466380000)\/", "books": [{ "name": "mvc 4.0 asdasd a", "author": "feng.wei.cai" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "bruce", "title": "hass", "date": "\/Date(1419552536000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "jack", "title": "tit", "date": "\/Date(1419466380000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }, { "name": "elon", "title": "boss", "date": "\/Date(1419466440000)\/", "books": [{ "name": "mvc 4.0", "author": "feng" }, { "name": "jQuery 10", "author": "Jonh" }] }] };
+        //$(".data1").fill(
+        //        data
+        //        ,
+        //        {
+        //            pager:true,
+        //            ///是否追加到列表上，默认是false
+        //            append: true
+        //          ,
+        //            ///自定义格式内容
+        //            formater: function (v,arg) {
+        //                if (arg.path == "date") {
+        //                    v ="中文日期格式（"+ v.getFullYear() + "年" + v.getMonth() + "月" + v.getDay() + "日）";
+        //                }
+        //                return v;
+        //            }
+        //            ,
+        //            ///填充完毕后执行的方法
+        //            complete: function () { alert("complete") }
+        //        }
+        //        )
+        /////填充表单来自服务端的数据
+        //$(".data2").fill("/home/getform");
+
+        /////填充字符串
+        //$(".data3").fill(null, "<p> 啊手动阀啊手动阀收到卡卡快乐圣诞快乐开始看了看的发生的第三方阿娇阿斯顿</p>");
+
+        ////填充html字符串
+        //$(".data4").fill({ content: "<h4>这里是html内容</h4><p> 啊手动阀啊手动阀收到卡卡快乐圣诞快乐开始看了看的发生的第三方阿娇阿斯顿</p>",title:"提示嘻嘻嘻。。。。" })
+
+        //提交复杂的数据模型，转换成键值对，服务端可以直接使用mvc的默认模型绑定器
+        $("#btnSubmit").click(function () {
+            var model = {
+                ids: [1, 5, 8, 45]
+                    , create: new Date("2011/4/25"), children: [{ name: "hh", id: 54 }, { name: "ccc", id: 545 }, { name: "lll", id: 58, createdate: new Date("2015/1/29 15:25:59") }]
+            };
+            $.ajax({ url: "/home/post", type: "POST", data: $.toNameValues(model) })
+        });
+    </script>
+</body>
+
+</html>
