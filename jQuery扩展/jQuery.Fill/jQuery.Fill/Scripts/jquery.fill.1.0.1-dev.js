@@ -14,7 +14,7 @@
         }
         return str;
     }
-    function parsePostParams(e) { var p = null; if (!$.isPlainObject(p = pars(e.attr("data-postparams")))) { if ($.isFunction(p)) { p = p.call(e) } else if (p instanceof jQuery) { p = p.modelState().model; } } return p; }
+    function parsePostParams(e) { var p = null; if (!$.isPlainObject(p = pars(e.attr("data-postparams")))) { if ($.isFunction(p)) { p = p.call(e) } else if ($.isFunction(p.modelState)) { p = p.modelState().model; } } return p; }
     function getPostParams(s, d) {
         var c = getContext(s);
         if (!$.isPlainObject(d) && !$.isPlainObject(d = c.postparams) && !$.isPlainObject(d = parsePostParams(s))) {
@@ -23,7 +23,7 @@
         return c.postparams = d;
     }
     function getContext(e) {
-        if (e instanceof jQuery) {
+        if ($.isFunction(e.data)) {
             var n = 'fill-context', c = e.data(n);
             if (c == null) { e.data(n, c = {}); }
             return c;
@@ -32,6 +32,7 @@
     }
     /// json填充扩展
     (function () {
+
 
         function setValue(root, pars) {
             var vl = pars.value,
@@ -199,9 +200,9 @@
                             if (n) {
                                 var el = tmp.clone();
                                 if (opt && $.isFunction(opt.creating)) {
-                                    var arg = { cancel: false, item: n, index: i, path: path };
+                                    var arg = { cancel: false, item: n, index: i, path: pars.path };
                                     opt.creating.call(e, arg, el);
-                                    if (arg.cancel) return;
+                                    if (arg.cancel) { return }
                                 }
                                 fillPoliy(root, { deep: pars.deep, target: el, value: n, path: pars.path, propertyName: '[]', index: i });
                                 arr.push(el);
