@@ -43,7 +43,11 @@
                 opt = getContext(root).option;
             if (!e) return;
             var p = "data-defaultValue";
-            var cfn = opt && opt.columns && opt.columns[path];
+            var cfn = null;
+            if (opt && opt.columns) {
+                cfn = opt.columns[path] || opt.columns[propertyName];
+            }
+
             if (!$.isFunction(cfn)) {
                 cfn = (function (p) {
                     return function (v, arg) {
@@ -160,14 +164,14 @@
             function (root, pars) {
                 var d = pars.value;
                 if ($.isPlainObject(d)) {
-                    pars.item = d;
+                    //pars.item = d;
                     var p = pars.path || ''
                     if (p) { p = p + '.'; }
                     for (var i in d) {
                         if (!i) continue;
                         var path = p + i, propertyName = i;
                         var target = findElements(pars.target || root, path, propertyName);
-                        fillPoliy(root, { deep: pars.deep + 1, value: d[i], target: target, propertyName: propertyName, path: path });
+                        fillPoliy(root, { deep: pars.deep + 1, value: d[i], item: d, target: target, propertyName: propertyName, path: path });
                     }
                     return true;
                 }
