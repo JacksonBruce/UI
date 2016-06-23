@@ -164,13 +164,18 @@
             function (root, pars) {
                 var d = pars.value;
                 if ($.isPlainObject(d)) {
-                    //pars.item = d;
+                    var el = pars.target || root;
+                    if (el.is(':empty')) {
+                        setValue(root, pars);
+                        return true;
+                    }
+
                     var p = pars.path || ''
                     if (p) { p = p + '.'; }
                     for (var i in d) {
                         if (!i) continue;
                         var path = p + i, propertyName = i;
-                        var target = findElements(pars.target || root, path, propertyName);
+                        var target = findElements(el, path, propertyName);
                         fillPoliy(root, { deep: pars.deep + 1, value: d[i], item: d, target: target, propertyName: propertyName, path: path });
                     }
                     return true;
@@ -179,12 +184,16 @@
             function (root, pars) {
                 var d = pars.value;
                 if ($.isArray(d)) {
+                    var e = pars.target || root;
+                    if (e.is(':empty')) {
+                        setValue(root, pars);
+                        return true;
+                    }
                     var ics = "fill-item",
                         tk = 'fill-template',
                         ck = 'fill-template-container',
                         ik = 'fill-template-intopoint',
                         opt = getContext(root).option,
-                        e = pars.target || root,
                         tmp, cs,
                         templateContainer, intopoint;
                     if ((tmp = e.data(tk)) || (tmp = e.children("." + (cs = "template"))).length || (tmp = e.find("." + cs)).length) {
@@ -197,6 +206,11 @@
                             templateContainer = e.data(ck);
                             intopoint = e.data(ik);
                         }
+
+                        if (tmp.length == 0 || (tmp.is('[data-path]') && !tmp.is('[data-path="' + (pars.path || '/') + '"]'))) {
+                            return false;
+                        }
+
                         ///如果不是追加，那么移除已填充的项
                         if (!(opt && opt.append)) { templateContainer.children('.' + ics).remove(); }
                         var arr = [];
