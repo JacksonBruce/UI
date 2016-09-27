@@ -2,9 +2,12 @@
 jQuery.fill 介绍
 
 jQuery.fill是一组填充数据的jQuery扩展方法，它试图将html、css与数据分离，减少大量的html拼接代码，提高web前端的工作效率，主要功能有：fill向匹配DOM对象填充来自服务器数据或者json对象；modelState将匹配的DOM对象反序列化为json对象，它可以和表单、jQuery.validtion协同工作，toNameValues是一个很有趣jQuery静态方法，它将复杂的js对象，数组等转换成一组键/值对提交给服务端，它和asp.net mvc的默认模型绑定器协同工作。
+
+
 约定
 
 数据填充使用了属性约定和ID约定，分页、排序和模板使用了css类选择器约定
+
 数据填充约定
 
 向一个jQuery对象填充数据时，查找带有data-fill | data-field | name属性的DOM对象并将json对象与之匹配的属性值向其填充，如果同时出现这个三个属性那么就按照前面的顺序进行优先填充，填充的默认规则由其标签类型决定，默认填充规则如下：
@@ -15,22 +18,26 @@ jQuery.fill是一组填充数据的jQuery扩展方法，它试图将html、css�
 5、text标签和data-replace属性，（text不是一个有效的html标签）当遇到text标签，或者标签包含有data-replace属性时，它将被填充的值替换掉；
 也可以通过data-property属性指定个填充属性来改变以上的默认规则，例如：<a data-fill="url" data-property="href">点击这里</a>； data-property属性的":text"和":html"有特殊的意义，:text表示填充文本内容也是大多数非表单标签（img除外）的默认填充规则，而:html则是用来指定填充元素的innerHTML属性，在填充富文本时很有用。
 通过这个例子演示一下数据填充约定
+
 CSS类选择器约定
 
 当填充一个列表或者树形结构的数据时，需要在填充的容器中定义模板，用“template”CSS类选择器指定当前块是模板；
 列表的分页选择器约定：分页模板用：pager、第一页：first、最后页：last、下一页：next、上一页：prev、数字：number，其他信息遵循数据填充约定，分页按钮包含有data-page属性指定页面数；
 列表的排序需要指定一个表头，表头的默认类选择器是“thead”，可排序列由“sort”指定，包含“active”类选择器的表示当前排序列，默认是升序，“desc”类选择器指定降序，每个可排序列需要通过sortExpression（或者data-sortExpression）属性指定排序的字段，暂时不支持多字段排序规则。
+
 触发器约定
 
 触发器是当用户触发click事件时才填充页面上的元素，或者提交表单，使用触发器减少大量重复的代码。
 data-toggle属性指定触发器的类型，是必须的，可选值有：fill | action | load,其实只有两种类型：填充和动作，load是填充的扩展形式，指定只在页面装载时自动填充元素，它必须和data-src属性一起使用，data-src指定数据来源的路径；
 data-target属性指定事件触发后填充的目标或者要提交的表单（非表单元素也可以）
+
 方法
 
 了解了前面的一些约定，再来看方法的使用和案例就容易理解多了
 fill(url,params,options)方法
 
 描述：向jQuery对象填充来自服务端的数据，服务端必须返回json格式的数据。
+
 参数
 
 url: string 类型， 远程服务器的地址,将post请求这个地址获取数据
@@ -126,12 +133,14 @@ options（填充选项）
 fill(data,options)方法
 
 描述：向jQuery对象填充来指定的数据。
+
 参数
 
 data:PlainObject 类型|| number 类型 || bool 类型 || datetime 类型 || array 类型，将要填充的数据。
 
 options: PlainObject 类型，填充选项，详细说明同上
 fill(url,allowPaging,complete)方法
+
 参数
 
 url: string 类型， 远程服务器的地址,将post请求这个地址获取数据
@@ -142,6 +151,7 @@ complete: function(data) 类型 填充完成后触发的事件。
 
 注：等同于fill(url,null,{complete:complete,pager:allowPaging})
 fill(url,params,filling,complete)方法
+
 参数
 
 url: string 类型， 远程服务器的地址,将post请求这个地址获取数据
@@ -156,6 +166,7 @@ complete: function(data) 类型 填充完成后触发的事件。
 modelState(a)方法
 
 描述：将表单或者DOM对象反序列化为json对象，如果浏览器支持h5的文件IO，那么此方法可以读取文件上传控件（input[type='file']）的文件信息。
+
 参数
 
 a:PlainObject 类型,一组验证函数,例如：{"字段名":function(v,arg){ ... return error;}[,....]}
@@ -181,6 +192,7 @@ a:PlainObject 类型,一组验证函数,例如：{"字段名":function(v,arg){ .
 clearModel(a)方法
 
 描述：调用此方法清空模型的值。
+
 参数
 
     this:jQuery 对象，表示当前调用方法的jQuery对象。
@@ -195,6 +207,7 @@ clearModel(a)方法
 [static] toNameValues(model,isFormData)方法
 
 这是一个静态方法，将模型转换成键值对字典。提交复杂的数据模型时需要转换成键值对，服务端可以直接使用mvc的默认模型绑定器绑定到对应的模型，如果data参数中包含文件，那么自动转换为表单数据包（FormData）。
+
 参数
 
     model: PlainObject 类型 || Array 类型，将要转换的数据。
@@ -207,6 +220,7 @@ clearModel(a)方法
 [static] ajaxFormData(url,settings)方法
 
 这个方法是对ajax方法的一个补充,它以数据流的方式提交FormData类型的数据，如果当前浏览器不支持FormData类型，那么调用ajax方法。
+
 参数
 
     url: string 类型,远程处理程序的地址。
@@ -223,10 +237,12 @@ clearModel(a)方法
         progress: function(e,XMLHttpRequest) 类型，数据发送中触发的事件，这个事件用于更新进度条的，新增的一个事件。
         参数
             e: event类型，有两个重要的属性：loaded 和 total 通过这两个属性来计算已经完成的百分比
+            
 
 触发器
 
 当点击页面上的某个按钮时填充或者提交表单，而无需编写重复的javascript代码。
+
 触发器属性
 
     data-toggle: 枚举类型 必填的 枚举值：fill | load | action
@@ -236,6 +252,7 @@ clearModel(a)方法
 填充触发器
 
 当点击触发器控件时填充指定的板面,触发器类型是：data-toggle="fill"
+
 属性
 
     data-options: PlainObject 类型，可选的，填充选项，优先选用触发器控件的填充选项，如果为指定触发器控件的填充选项，那么自动解析填充目标的填充选项。
@@ -244,6 +261,7 @@ clearModel(a)方法
 页面装载时填充
 
 页面装载时填充板面,触发器类型是：data-toggle="load"，这种触发器忽略data-target属性，data-src是必填的，页面装载时自动填充当前板面。
+
 动作触发器
 
 当点击触发器控件时，那么将反序列化目标板面，并提交数据的服务端，用于提交表单很合适，触发器类型是：data-toggle="action"
