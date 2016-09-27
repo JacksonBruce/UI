@@ -176,6 +176,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PaginationController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -198,10 +199,12 @@
     <Content Include="Content\Site.css" />
     <Content Include="HtmlPage1.html" />
     <Content Include="HtmlPage2.html" />
+    <Content Include="log.html" />
     <Content Include="pagination.html" />
     <Content Include="progress.html" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <None Include="Properties\PublishProfiles\Test.pubxml" />
     <None Include="Properties\PublishProfiles\发布配置.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\combobox.js" />
@@ -265,6 +268,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Views\AsyncTest\" />
     <Folder Include="Views\Pagination\" />
+    <Folder Include="Views\Test\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

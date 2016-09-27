@@ -6,6 +6,9 @@ using System.Linq.Expressions;
 using System.Web;
 using System.Web.Mvc;
 using System.Reflection;
+using System.Threading.Tasks;
+using System.IO;
+using System.Web.Caching;
 
 namespace jQuery.Fill.Controllers
 {
@@ -28,8 +31,37 @@ namespace jQuery.Fill.Controllers
             }
         }
     }
-    
 
+    public class Log {
+        public DateTime time { get; set; }
+        public int line { get; set; }
+        public int id { get; set; }
+        public int msg { get; set; }
+        public string name { get; set; }
+        public string file { get; set; }
+        public string threadName { get; set; }
+        public static async Task<IEnumerable<Log>> Load() {
+            var c = HttpContext.Current;
+            string key = "log_cache";
+            Log[] arr = c.Cache[key] as Log[];
+            if (arr != null) return arr;
+
+            var d = new DirectoryInfo(c.Server.MapPath("~/app_data/trace"));
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            var fs = d.GetFiles("*.log");
+            foreach (var f in fs) {
+                var str = File.ReadAllText(f.FullName);
+                if (sb.Length == 0) {
+                    str = str.TrimStart(',');
+                }
+                sb.Append(str);
+            }
+            arr = await Task.Factory.StartNew(() => Newtonsoft.Json.JsonConvert.DeserializeObject<Log[]>("[" + sb.ToString() + "]"));
+            c.Cache.Add(key, arr, new CacheDependency(d.FullName), Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(30), CacheItemPriority.Normal, null);
+
+            return arr;
+        }
+    }
     public class PaginationController : Controller
     {
         IEnumerable<T> CreateOrderByQuery<T>(IQueryable<T> list, string sortExpression)
@@ -65,6 +97,16 @@ namespace jQuery.Fill.Controllers
            
 
             //return Json(new { rows = new object[0], pager = new { } });
+            return Json(new { rows = data.Skip(pageSize * pageIndex).Take(pageSize), pager = new { pageIndex = pageIndex, pageSize = pageSize, total, pageCount = total / pageSize + (total % pageSize > 0 ? 1 : 0) } });
+        }
+        public async Task<ActionResult> GetLogs(int pageSize = 10, int pageIndex = 0, string sortExpression = null) {
+
+            var data = await Log.Load();
+            var total = data.Count();
+            if (!string.IsNullOrWhiteSpace(sortExpression)) {
+                data = CreateOrderByQuery(data.AsQueryable(), sortExpression);
+            }
+            
             return Json(new { rows = data.Skip(pageSize * pageIndex).Take(pageSize), pager = new { pageIndex = pageIndex, pageSize = pageSize, total, pageCount = total / pageSize + (total % pageSize > 0 ? 1 : 0) } });
         }
     }

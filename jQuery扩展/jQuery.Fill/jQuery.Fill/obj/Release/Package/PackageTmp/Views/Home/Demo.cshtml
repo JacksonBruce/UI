@@ -1,0 +1,415 @@
+﻿@{
+    ViewBag.Title = "演示";
+}
+@section styles{
+<style>
+    .light {color:green;font-weight:bold;}
+</style>    
+}
+<h2>@ViewBag.Title.</h2>
+
+<div class="container">
+    <section class="row">
+        <h3>目录</h3>
+        <div>
+            <ol>
+                <li><a href="#ref">引用文件</a></li>
+                <li><a href="#list">填充列表：分页、排序</a></li>
+                <li><a href="#tree">填充树形列表</a></li>
+                <li><a href="#form">填充、提交表单</a> </li>
+                <li><a href="#formdata">ajax提交FormData数据包</a></li>
+            </ol>
+        </div>
+        <div>
+            <h4 id="ref">引用文件</h4>
+            <p>必须引用的文件</p>
+<pre>
+jQuery 插件
+&lt;script src="/Scripts/jquery-1.10.2.min.js"&gt;&lt;/script&gt;    
+fill插件 开发版：30KB，压缩版：11KB；
+<span class="light">&lt;script src="/Scripts/jquery.fill.1.0.js"&gt;&lt;/script&gt;</span>
+</pre>
+            <p>可选择的引用的文件</p>
+<pre>                
+bootstrap 组件
+&lt;script src="/Scripts/bootstrap.min.js"&gt;&lt;/script&gt;    
+验证组件
+&lt;script src="/Scripts/jquery.validate.min.js"&gt;&lt;/script&gt;    
+
+</pre>
+        </div>
+        <div>
+            <h4 id="list">填充列表：分页、排序</h4>
+            <p>主要代码如下，注意高亮突出显示的代码：</p>
+<pre>
+    &lt;table class="table" <i class="light">data-src="/Pagination/index" data-toggle="load" data-postparams="{pageSize:20}" data-options="{pager:true,loading:'.loading',sort:true}"</i>&gt;
+    &lt;thead&gt;
+    &lt;tr class="thead"&gt;
+    &lt;th&gt;#&lt;/th&gt;
+    &lt;th class="sort active" <i class="light">data-sortexpression="Name"</i>&gt;
+                    书名
+    &lt;span class="glyphicon glyphicon-arrow-down"&gt;&lt;/span&gt;&lt;span class="glyphicon glyphicon-arrow-up"&gt;&lt;/span&gt;
+                &lt;/th&gt;
+    &lt;th class="sort" <i class="light">data-sortexpression="Name"</i>&gt;作者
+    &lt;span class="glyphicon glyphicon-arrow-down"&gt;&lt;/span&gt;&lt;span class="glyphicon glyphicon-arrow-up"&gt;&lt;/span&gt;&lt;/th&gt;
+    &lt;th class="sort" <i class="light">data-sortexpression="Publisher"</i>&gt;出版社
+    &lt;span class="glyphicon glyphicon-arrow-down"&gt;&lt;/span&gt;&lt;span class="glyphicon glyphicon-arrow-up"&gt;&lt;/span&gt;&lt;/th&gt;
+    &lt;th&gt;时间&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+    &lt;tbody&gt;
+    &lt;tr <i class="light">class="template" style="display:none;"</i>&gt;
+    &lt;td&gt;
+    &lt;label&gt;
+    &lt;input type="checkbox" <i class="light">data-fill="ID"</i> /&gt;
+    &lt;text <i class="light">data-fill="Number"</i>&gt;&lt;/text&gt;
+                    &lt;/label&gt;
+                &lt;/td&gt;
+    &lt;td <i class="light">data-fill="Name"</i>&gt;书名&lt;/td&gt;
+    &lt;td <i class="light">data-fill="Author"</i>&gt;作者&lt;/td&gt;
+    &lt;td <i class="light">data-fill="Publisher"</i>&gt;出版社&lt;/td&gt;
+    &lt;td <i class="light">data-fill="DateTime" data-dateformat="{yyyy}-{MM}-{dd} 星期{w:日,一,二,三,四,五,六}，{hh}:{mm}:{ss}"</i>&gt;时间&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;tfoot&gt;
+    &lt;tr&gt;
+    &lt;td colspan="5" style="text-align:center;"&gt;
+    &lt;ul <i class="light">class="pagination" style="display:none;"</i>&gt;
+    &lt;li <i class="light">class="first"</i>&gt;
+    &lt;a href="javascript:"&gt;
+    &lt;span aria-hidden="true"&gt;&laquo;&lt;/span&gt;
+                            &lt;/a&gt;
+                        &lt;/li&gt;
+    &lt;li <i class="light">class="number"</i>&gt;&lt;a href="javascript:"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li <i class="light">class="last"</i>&gt;
+    &lt;a href="javascript:"&gt;
+    &lt;span aria-hidden="true"&gt;&raquo;&lt;/span&gt;
+                            &lt;/a&gt;
+                        &lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tfoot&gt;
+    &lt;/table&gt;
+</pre>
+            <p><a href="~/pagination.html" target="_blank">查看演示效果</a></p>
+        </div>
+        <div>
+            <h4 id="tree">填充树形列表</h4>
+            <p>树形，复杂数据类型的填充</p>
+            <p>HTML代码：</p>
+<pre>
+    &lt;h2&gt;
+            填充层级对象(对象中的对象)
+        &lt;/h2&gt;
+    &lt;div id="hierarchy"&gt;
+    &lt;form&gt;
+    &lt;div class="form-group"&gt;
+    &lt;label&gt;书名:&lt;/label&gt;
+    &lt;input <i class="light">name="Name"</i> type="text" class="form-control" /&gt;
+                &lt;/div&gt;
+    &lt;h4&gt;作者&lt;/h4&gt;
+    &lt;div class="form-group"&gt;
+    &lt;label&gt;First Name:&lt;/label&gt;
+    &lt;input <i class="light">name="Author.FirstName"</i> type="text" class="form-control" /&gt;
+                &lt;/div&gt;
+    &lt;div class="form-group"&gt;
+    &lt;label&gt;last Name:&lt;/label&gt;
+    &lt;input <i class="light">name="Author.LastName"</i> type="text" class="form-control" /&gt;
+                &lt;/div&gt;
+            &lt;/form&gt;
+        &lt;/div&gt;
+        
+    &lt;h2&gt;填充固定的树形对象&lt;/h2&gt;
+    &lt;div id="tree"&gt;
+    &lt;ul&gt;
+    &lt;li&gt;
+    &lt;h5 <i class="light">data-fill="Name"</i>&gt;&lt;/h5&gt;
+    &lt;ul <i class="light">data-fill="leaf"</i>&gt;
+    &lt;li&gt;&lt;h5 <i class="light">data-fill="Name"</i>&gt;&lt;/h5&gt;
+    &lt;ul <i class="light">data-fill="leaf"</i> &gt;
+    &lt;li&gt;&lt;h5 <i class="light">data-fill="Name"</i>&gt;&lt;/h5&gt;
+    &lt;ul <i class="light">data-fill="leaf"</i>&gt;
+    &lt;li&gt;&lt;h5 <i class="light">data-fill="Name"</i>&gt;&lt;/h5&gt;&lt;/li&gt;
+                                    &lt;/ul&gt;&lt;/li&gt;
+                            &lt;/ul&gt;
+                        &lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;h2&gt;填充树形列表&lt;/h2&gt;
+    &lt;ul id="treeList"&gt;
+    &lt;li <i class="light">class="template"</i> &gt;
+    &lt;h5&gt;
+    &lt;span <i class="light">data-fill="Name"</i>&gt;&lt;/span&gt;
+                &lt;/h5&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+</pre>
+<p>javascript 代码：</p>
+<pre>    
+        $("#hierarchy").fill({ Name: '深入理解Bootstrap', Author: { FirstName: '徐', LastName: '涛' } });
+        <span class="light">///填充固定的树形对象</span>
+        $('#tree').fill({ Name: 'root', leaf: { Name: 'leaf-1', leaf: { Name: 'leaf-2', leaf: { Name: 'leaf-3' } } } });
+        <span class="light">///树形列表数据</span>
+        var json = [
+            {
+                Name: 'root-0',
+                children: [
+                    {
+                        Name: 'leaf-0-0',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                    ,
+                    {
+                        Name: 'leaf-0-1',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                ]
+            }
+            ,
+            {
+                Name: 'root-1',
+                children: [
+                    {
+                        Name: 'leaf-0-0',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                    ,
+                    {
+                        Name: 'leaf-0-1',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                ]
+            }
+            ,
+            {
+                Name: 'root-2',
+                children: [
+                    {
+                        Name: 'leaf-0-0',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                    ,
+                    {
+                        Name: 'leaf-0-1',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                ]
+            }
+            ,
+            {
+                Name: 'root-3',
+                children: [
+                    {
+                        Name: 'leaf-0-0',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                    ,
+                    {
+                        Name: 'leaf-0-1',
+                        children: [{
+                            Name: 'leaf-2',
+                            children: [{ Name: 'leaf-3' }]
+                        }]
+                    }
+                ]
+            }
+        ];
+        <span class="light">///填充树形对象</span>
+        $('#treeList').fill(json, { tree: true })
+</pre>
+            <p><a href="~/complex-fill.html" target="_blank">查看演示效果</a></p>
+        </div>
+        <div>
+            <h4 id="form">填充表单</h4>
+            <p>演示触发器填充或提交表单和通过脚本填充或提交表单</p>
+            <h5>HTML代码:</h5>
+<pre>
+    &lt;div class="container"&gt;
+    &lt;div class="row"&gt;
+    &lt;form action="/home/formPost"&gt;
+    &lt;h2&gt;填充表单&lt;/h2&gt;
+    &lt;div class="data2"&gt;
+    &lt;div&gt;
+    &lt;label&gt;&lt;input <i class="light">name="Gender"</i> type="radio" value="true" /&gt;男 &lt;/label&gt;
+    &lt;label&gt;&lt;input <i class="light">name="Gender"</i> type="radio" value="false" /&gt;女 &lt;/label&gt;
+                    &lt;/div&gt;
+    &lt;div&gt;
+    &lt;label&gt;name：&lt;/label&gt;&lt;input <i class="light">name="name"</i> required minlength="5" /&gt;
+                    &lt;/div&gt;
+    &lt;div&gt;
+    &lt;label&gt;title：&lt;/label&gt;&lt;input <i class="light">name="title"</i> /&gt;
+                    &lt;/div&gt;
+    &lt;div&gt;
+    &lt;label&gt;date：&lt;/label&gt;&lt;input <i class="light">name="date"</i> /&gt;
+                    &lt;/div&gt;
+    &lt;h3&gt;书籍&lt;/h3&gt;
+    &lt;div <i class="light">data-fill="book"</i>&gt;
+    &lt;div&gt;
+    &lt;label&gt;name：&lt;/label&gt;&lt;input <i class="light">name="book.name"</i> /&gt;
+                        &lt;/div&gt;
+    &lt;div&gt;
+    &lt;label&gt;author：&lt;/label&gt;&lt;input <i class="light">name="book.author"</i> /&gt;
+                        &lt;/div&gt;
+    &lt;input <i class="light">name="book.ID"</i> type="hidden" value="52" /&gt;
+                    &lt;/div&gt;
+    &lt;input <i class="light">name="ID"</i> type="hidden" value="25" /&gt;
+                &lt;/div&gt;
+            &lt;/form&gt;
+    &lt;h5&gt;触发器&lt;/h5&gt;
+    &lt;div&gt;
+    &lt;a href="javascript:" <i class="light">data-toggle="action" data-target="form" data-callback="function (r,e) { console.debug(r);console.debug(e);}"</i>&gt;提交&lt;/a&gt;
+    &lt;a href="javascript:" <i class="light">data-toggle="fill" data-src="/home/getForm" data-target="form"</i>&gt;填充&lt;/a&gt;
+            &lt;/div&gt;
+    &lt;h5&gt;通过代码实现&lt;/h5&gt;
+    &lt;div&gt;
+    &lt;a href="javascript:" <i class="light">id="btnSubmit"</i>&gt;提交&lt;/a&gt;
+    &lt;a href="javascript:" <i class="light">id="btnGetForm"</i>&gt;填充&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+</pre>
+            <h5>javascript代码：</h5>
+<pre>
+        &lt;script&gt;
+
+        $(function () {
+            $('#btnGetForm').click(function () {
+                <span class="light">//获取远程数据并填充表单</span>
+                $('form').fill("/home/getForm");
+            })
+            $('#btnSubmit').click(function () {
+                var frm = $('form'), ms = frm.modelState();
+                <span class="light">///如果没有错误</span>
+                if (!ms.errors) {
+                    <span class="light">//提交表单</span>
+                    $.ajaxFormData('/home/formPost', {
+                        data: ms.model, success: function (r) {
+                            <span class="light">//在控制台中输出返回结果</span>
+                            console.debug(r);
+                            <span class="light">///清空表单</span>
+                            frm.clearModel();
+                        }
+                    })
+                }
+            })
+        })
+        &lt;/script&gt;
+</pre>
+            <p><a href="~/form-post.html" target="_blank">查看演示效果</a></p>
+        </div>
+        <div>
+            <h4 id="formdata">ajax提交FormData数据包</h4>
+            <p>有时候提交表单时需要做一个很酷炫的进度条，有时候表单包含文件时，就可以使用FormData数据提交表单，当然需要浏览器支持HTML5的FormData类</p>
+            <h5>HTML代码：</h5>
+<pre>
+    &lt;div class="container"&gt;
+    &lt;h1&gt;上传进度条&lt;/h1&gt;
+    &lt;form action="/home/File"&gt;
+    &lt;div class="form-group"&gt;
+    &lt;label&gt;name:&lt;/label&gt;
+    &lt;input class="form-control" type="text" name="name" required /&gt;
+            &lt;/div&gt;
+    &lt;div class="form-group"&gt;
+    &lt;label&gt;file:&lt;/label&gt;
+    &lt;input type="file" name="file" /&gt;
+            &lt;/div&gt;
+    &lt;label&gt;上传进度：&lt;/label&gt;
+    &lt;div class="progress"&gt;
+    &lt;div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="-100" aria-valuemin="-100" aria-valuemax="100" style="width: 0"&gt;
+    &lt;span class="sr-only"&gt;0% Complete (success)&lt;/span&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+    &lt;h4&gt;用触发器实现&lt;/h4&gt;
+    &lt;div class="clearfix"&gt;
+    &lt;button type="button" class="btn" <i class="light">data-toggle="action" data-target="form" data-progress=".progress" data-callback="function(e,a){ if(a.error){alert('出错了')}else{alert('成功了');} }"</i>&gt;submit&lt;/button&gt;
+            &lt;/div&gt;
+    &lt;br /&gt;
+    &lt;div class="clearfix"&gt;
+    &lt;button type="button" class="btn" <i class="light">data-toggle="action" data-target="form" data-progress="prog" data-callback="complete"</i>&gt;submit（自定义函数）&lt;/button&gt;
+            &lt;/div&gt;
+    &lt;h4&gt;用脚本实现&lt;/h4&gt;
+    &lt;div class="clearfix"&gt;
+    &lt;button type="button" <i class="light">id="submit"</i> class="btn"&gt;submit&lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/form&gt;
+    &lt;/div&gt;
+</pre>
+            <h5>javascript代码：</h5>
+<pre>
+        <span class="light">///触发器中的自定义函数</span>
+        function prog(e, xhr) {
+            var pe = e.loaded / e.total * 100, s = $(this), p = s.data('prog');
+            if (!p) { p = $('.progress-bar'); s.data('prog', p); p.parent().show(); }
+            p.width(pe + '%').attr('aria-valuenow', pe).children('span').text(pe + '% Complete (success)');
+        }
+        function complete(e, a) {
+            var s = $(this), p = s.data('prog');
+            setTimeout(function () { p.parent().hide();s.data('prog',null) },3000);
+            if (a.error) { alert('出错了') } else { alert('成功了'); }
+        }
+        <span class="light">///用脚本实现</span>
+        $(function () {
+            $("#submit").click(function () {
+                var btn = $(this), s = $('form'), ms = s.modelState(), p = $('.progress-bar');
+                if (ms.errors) return;
+                btn.button("loading");
+                p.parent().show();
+                $.ajaxFormData('/home/File', {
+                    data: ms.model
+                    , progress:
+                        function (e, xhr) {
+                            var pe = e.loaded / e.total * 100;
+                            p.width(pe + '%').attr('aria-valuenow', pe).children('span').text(pe + '% Complete (success)');
+                        }
+                    ,
+                    complete: function (xhr, txt, s) {
+                        btn.button('reset')
+                        console.debug('complete');
+                        console.debug(txt);
+                        console.debug(s);
+                        setTimeout(function () { p.parent().hide(); }, 3000);
+                    }
+                    ,
+                    success: function (d, state, xhr) {
+                        console.debug(d);
+                        console.debug(state);
+                        alert('success');
+                    }
+                    ,
+                    error: function (xhr, status, statusText) {
+                        console.debug('error:');
+                        console.debug(status);
+                        console.debug(statusText);
+                    }
+                })
+            });
+        })
+</pre>
+            <p><a href="/progress.html" target="_blank">查看演示效果</a></p>
+        </div>
+    </section>
+</div>

@@ -31,7 +31,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr class="template" style="display:none;">
+            <tr class="template">
                 <td>
                     <label>
                         <input type="checkbox" data-fill="ID" />
@@ -42,6 +42,11 @@
                 <td data-fill="Author">作者</td>
                 <td data-fill="Publisher">出版社</td>
                 <td data-fill="DateTime" data-dateformat="{yyyy}-{MM}-{dd} 星期{w:日,一,二,三,四,五,六}，{hh}:{mm}:{ss}">时间</td>
+            </tr>
+            <tr class="empty-data">
+                <td colspan="12">
+                    没有数据
+                </td>
             </tr>
         </tbody>
         <tfoot>
@@ -67,7 +72,9 @@
     <div class="loading">
         loading...
     </div>
-    <script src="Scripts/jquery-1.10.2.min.js"></script>
-    <script src="Scripts/jquery.fill.1.0.js"></script>
+    <!--<script src="Scripts/jquery-1.10.2.min.js"></script>-->
+    <script src="Scripts/jquery-1.7.1.min.js"></script>
+    <script src="Scripts/jquery.fill.1.0.1-dev.js"></script>
+    <!--<script src="Scripts/jquery.fill.1.0.js"></script>-->
 </body>
 </html>

@@ -14,7 +14,18 @@
         }
         return str;
     }
-    function parsePostParams(e) { var p = null; if (!$.isPlainObject(p = pars(e.attr("data-postparams")))) { if ($.isFunction(p)) { p = p.call(e) } else if ($.isFunction(p.modelState)) { p = p.modelState().model; } } return p; }
+    function parsePostParams(e) {
+        var p = null;
+        if (!$.isPlainObject(p = pars(e.attr("data-postparams")))) {
+            if ($.isFunction(p)) {
+                p = p.call(e)
+            }
+            else if (p && $.isFunction(p.modelState)) {
+                p = p.modelState().model;
+            }
+        }
+        return p;
+    }
     function getPostParams(s, d) {
         var c = getContext(s);
         if (!$.isPlainObject(d) && !$.isPlainObject(d = c.postparams) && !$.isPlainObject(d = parsePostParams(s))) {

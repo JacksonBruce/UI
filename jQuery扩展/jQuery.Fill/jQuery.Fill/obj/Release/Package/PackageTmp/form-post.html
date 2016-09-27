@@ -2,65 +2,85 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title></title>
+    <title>表单填充、提交演示</title>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
-    <div>
-        <form action="/home/formPost">
-            <h2>填充表单</h2>
-            <div class="data2">
+    <div class="container">
+        <div class="row">
+            <form action="/home/formPost">
+                <h2>填充表单</h2>
+                <div class="data2">
 
-                <div>
-                    <label><input name="Gender" type="radio" value="true" />男 </label>
-                    <label><input name="Gender" type="radio" value="false" />女 </label>
-                </div>
-                <div>
-                    <label>name：</label><input name="name" required minlength="5" />
-                </div>
-                <div>
-                    <label>title：</label><input name="title" />
-                </div>
-                <div>
-                    <label>date：</label><input name="date" />
-                </div>
-                <h3>书籍</h3>
-                <div data-fill="book">
                     <div>
-                        <label>name：</label><input name="book.name" />
+                        <label><input name="Gender" type="radio" value="true" />男 </label>
+                        <label><input name="Gender" type="radio" value="false" />女 </label>
                     </div>
                     <div>
-                        <label>author：</label><input name="book.author" />
+                        <label>name：</label><input name="name" required minlength="5" />
                     </div>
-                    <input name="book.ID" type="hidden" value="52" />
-                </div>
-                <div>
-                    <label>image：</label>
-                    <input type="file" name="images" multiple accept="" />
-                </div>
-                <div>
+                    <div>
+                        <label>title：</label><input name="title" />
+                    </div>
+                    <div>
+                        <label>date：</label><input name="date" />
+                    </div>
+                    <h3>书籍</h3>
+                    <div data-fill="book">
+                        <div>
+                            <label>name：</label><input name="book.name" />
+                        </div>
+                        <div>
+                            <label>author：</label><input name="book.author" />
+                        </div>
+                        <input name="book.ID" type="hidden" value="52" />
+                    </div>
 
-                    <label><input name="ListID" type="checkbox" value="85" />85 </label>
-                    <label><input name="ListID" type="checkbox" value="2" />2 </label>
-                    <label><input name="ListID" type="checkbox" value="98" />98 </label>
-                    <label><input name="ListID" type="checkbox" value="75" />75 </label>
-                    <label><input name="ListID" type="checkbox" value="158" />158 </label>
-                    <label><input name="ListID" type="checkbox" value="78" />78 </label>
+                    <input name="ID" type="hidden" value="25" />
                 </div>
-                <input name="ID" type="hidden" value="25" />
-                <progress id="progress" style="width:200px;" value="0" max="1"></progress>
-                <div>
-                    <a href="javascript:" id="submit" data-toggle="action" data-target="form">submit</a>
-                </div>
-
+            </form>
+            <h5>触发器</h5>
+            <div>
+                <a href="javascript:" data-toggle="action" data-target="form" data-callback="function (r,e) { console.debug(r);console.debug(e);}">提交</a>
+                <a href="javascript:" data-toggle="fill" data-src="/home/getForm" data-target="form">填充</a>
             </div>
-        </form>
+            <h5>通过代码实现</h5>
+            <div>
+                <a href="javascript:" id="btnSubmit">提交</a>
+                <a href="javascript:" id="btnGetForm">填充</a>
+            </div>
+        </div>
     </div>
 
-
     <script src="Scripts/jquery-1.10.2.min.js"></script>
-    <script src="Scripts/jquery.validate.js"></script>
-    <!--<script src="Scripts/jquery.fill.1.0-min.js"></script>-->
-    <script src="Scripts/jquery.fill.1.0.js" async></script>
+    <script src="Scripts/jquery.validate.js" async></script>
+    <script src="Scripts/jquery.fill.1.0-dev.js" async></script>
+    <script>
+        
+        $(function () {
+            $('#btnGetForm').click(function () {
+                //获取远程数据并填充表单
+                $('form').fill("/home/getForm");
+            })
+            $('#btnSubmit').click(function () {
+                var frm = $('form'), ms = frm.modelState();
+                console.debug(ms);
+                ///如果没有错误
+                if (!ms.errors) {
+                    //提交表单
+                    $.ajaxFormData('/home/formPost', {
+                        data: ms.model, success: function (r) {
+                            //在控制台中输出返回结果
+                            console.debug(r);
+                            ///清空表单
+                            frm.clearModel();
+                        }
+                    })
+                }
+
+            })
+        })
+    </script>
     
 </body>
 </html>
