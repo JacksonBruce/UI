@@ -97,7 +97,13 @@ namespace jQuery.Fill.Controllers
            
 
             //return Json(new { rows = new object[0], pager = new { } });
-            return Json(new { rows = data.Skip(pageSize * pageIndex).Take(pageSize), pager = new { pageIndex = pageIndex, pageSize = pageSize, total, pageCount = total / pageSize + (total % pageSize > 0 ? 1 : 0) } });
+            return Json(new { rows = data.Skip(pageSize * pageIndex).Take(pageSize),
+                pager = new {
+                    pageIndex = pageIndex,
+                    pageSize = pageSize,
+                    total,
+                    //pageCount = total / pageSize + (total % pageSize > 0 ? 1 : 0)
+                } });
         }
         public async Task<ActionResult> GetLogs(int pageSize = 10, int pageIndex = 0, string sortExpression = null) {
 

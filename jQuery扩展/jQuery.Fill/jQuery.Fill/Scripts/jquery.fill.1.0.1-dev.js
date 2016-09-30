@@ -46,6 +46,7 @@
 
 
         function setValue(root, pars) {
+
             var vl = pars.value,
                 o = pars.item,
                 path = pars.path,
@@ -128,7 +129,10 @@
                     if (tmp === "" || tmp == "on" || tmp === undefined) { n.val(v) }
                     else { n[0].checked = n.val() == v + "" }
                 }
-                else if (n.is("input,textarea,select")) { n.val(v) }
+                else if (n.is("select")) {
+                    n.children().each(function (i, e) { if (v == $(e).val() || v == $(e).text()) { e.selected = true; return false; } })
+                }
+                else if (n.is("input,textarea")) { n.val(v) }
                 else if (tag == "TEXT" || n.attr("data-replace") !== undefined) { n.replaceWith(v + '') }
                 else if (tag == "IMG") { n.attr("src", v); }
                 else if (!n.children().length) { n.text(v) }
@@ -246,6 +250,7 @@
             );
         //装载数据
         function load(d, c) {
+            c.fillData = d;
             var root = this,
                 opt = c.option,
                 emptyData = c.emptyData;
@@ -590,18 +595,21 @@
                     if (e.length == 0) {
                         e = $("[data-field='" + n + "']", el);
                         if (e.length == 0) {
-                            e = $("[name='" + n + "']", e)
+                            e = $("[name='" + n + "']", el)
                         }
                     }
                 }
                 return e
             }
             var target = fn(path), arr;
-            if (!target || target.length == 0) { target = (target = fn(name ? name : (arr = path.split("."))[arr.length - 1])).length ? target : null }
+            if (!target || target.length == 0) {
+                target = (target = fn(name ? name : (arr = path.split("."))[arr.length - 1])).length ? target : null
+            }
             return target;
         }
 
         $.prototype.fill = function (url, data, opt, cfn) {
+
             var root = $(this),
                 context = getContext(root),
                 fn = function () {
@@ -614,7 +622,16 @@
                     init(root, context);
 
                 };
-
+            if (arguments.length == 0) {
+                url = context.url;
+                data = context.postparams;
+                opt = context.option;
+                if (url == null) {
+                    url = context.fillData;
+                    if (url == null) { return; }
+                    data = opt;
+                }
+            }
             if (typeof (url) != "string") {
                 if (url) {
                     opt = data;
@@ -712,7 +729,15 @@
                             if (v === "") { v = getVal(j, pr) }
                             j[0].checked = v && j.val() == v
                         }
-                        else if (j.is("input,textarea,select")) { j.val(v) }
+                        else if (j.is('select')) {
+                            var o = j.children('[value="' + v + '"]');
+                            if (!o.length) {
+                                o = j.children('[value="0"]');
+                                if (!o.length) { o = j.children(':first') }
+                            }
+                            if (o.length) { o[0].selected = true }
+                        }
+                        else if (j.is("input,textarea")) { j.val(v) }
                         else if (tag == "IMG") { j.attr("src", v) }
                         else if (!j.children().length) { j.text(v) }
                         //else { j.text(v) }
