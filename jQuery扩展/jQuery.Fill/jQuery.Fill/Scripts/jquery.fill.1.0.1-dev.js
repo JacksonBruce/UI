@@ -682,8 +682,8 @@
             return v
         };
         $.prototype.modelState = function (a) {
-            var s = this, fd = "data-field", fl = "data-fill", ne = "name", m = {}, errors = [];
-            $.each(s.find("[" + fd + "],[" + fl + "],[" + ne + "]").andSelf()
+            var s = this, fd = "data-field", fl = "data-fill", ne = "name", m = {}, errors = [], compatible = function (o) { return $.isFunction(o.andSelf) ? o.andSelf() : o.addBack() };
+            $.each(compatible(s.find("[" + fd + "],[" + fl + "],[" + ne + "]"))
                 , function (i, e) {
                     var v, fn, err = false, lbls, j = $(e), n = j.attr(ne) || j.attr(fl) || j.attr(fd);
                     if (n) {
