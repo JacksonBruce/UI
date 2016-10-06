@@ -719,7 +719,7 @@
                             var arg = { element: j, cancel: false };
                             v = fn.call(s, getVal(j, pr), arg);
                             if (arg.cancel) { return }
-                        } else { v = fn || "" }
+                        } else { v = fn || v }
                         if (pr) {
                             if (pr == ":html") { j.html(v) }
                             else if (pr == ":text") { j.text(v) }
@@ -737,7 +737,7 @@
                             }
                             if (o.length) { o[0].selected = true }
                         }
-                        else if (j.is("input,textarea")) { j.val(v) }
+                        else if (j.is("input:not(:hidden),textarea")) { j.val(v) }
                         else if (tag == "IMG") { j.attr("src", v) }
                         else if (!j.children().length) { j.text(v) }
                         //else { j.text(v) }
