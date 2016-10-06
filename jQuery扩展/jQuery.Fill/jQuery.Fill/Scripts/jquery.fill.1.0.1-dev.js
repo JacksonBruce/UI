@@ -737,7 +737,7 @@
                             }
                             if (o.length) { o[0].selected = true }
                         }
-                        else if (j.is("input:not(:hidden),textarea")) { j.val(v) }
+                        else if (j.is("input:not([type='hidden']),textarea")) { j.val(v) }
                         else if (tag == "IMG") { j.attr("src", v) }
                         else if (!j.children().length) { j.text(v) }
                         //else { j.text(v) }
